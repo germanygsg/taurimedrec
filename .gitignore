@@ -1,0 +1,60 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Tauri specific
+src-tauri/target
+src-tauri/target.wasm32-unknown-unknown/release/build/
+src-tauri/target/x86_64-pc-windows-msvc/release/build/
+src-tauri/target/x86_64-unknown-linux-gnu/release/build/
+src-tauri/target/aarch64-apple-darwin/release/build/
+
+# Data files (keep important ones)
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+!*.config.js
+!*.config.ts
+!src-tauri/tauri.conf.json
+!src-tauri/Cargo.toml
+
+# Build artifacts
+src-tauri/target/release/bundle/
+src-tauri/target/release/patient-management-app*
+
+# Temporary and log files
+*.tmp
+temp/
+*.bak
+*.old
+logs/
+*.log
+demo-logs.json
+data.txt
+patient.txt
+patient-new.txt
+old.json
+new-format.json
+master.json
