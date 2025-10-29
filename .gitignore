@@ -35,6 +35,8 @@ src-tauri/target/aarch64-apple-darwin/release/build/
 !package.json
 !package-lock.json
 !tsconfig.json
+!tsconfig.app.json
+!tsconfig.node.json
 !*.config.js
 !*.config.ts
 !src-tauri/tauri.conf.json
