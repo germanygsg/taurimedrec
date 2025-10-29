@@ -65,7 +65,7 @@ jobs:
       run: npm ci
 
     - name: Build frontend
-      run: npm run build
+      run: npx vite build --mode production
 
     - name: Build Tauri app for Linux
       run: npm run tauri build

@@ -59,7 +59,7 @@ jobs:
       run: cargo clippy --all-targets --all-features -- -D warnings
 
     - name: Build frontend
-      run: npm run build
+      run: npx vite build --mode production
 
     - name: Build Tauri app (dry run)
       run: cargo check --manifest-path=src-tauri/Cargo.toml --all-targets --all-features
