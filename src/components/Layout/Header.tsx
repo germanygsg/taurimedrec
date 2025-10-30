@@ -131,13 +131,20 @@ const Header: React.FC = () => {
   return (
     <Box
       sx={{
-        p: 3,
+        p: { xs: 1.5, md: 3 },
         borderBottom: '1px solid',
         borderColor: 'divider',
         backgroundColor: 'background.surface',
+        display: 'none',
       }}
     >
-      <Breadcrumbs separator="›">
+      <Breadcrumbs 
+        separator="›"
+        sx={{
+          fontSize: { xs: '0.875rem', md: '1rem' },
+          flexWrap: 'wrap',
+        }}
+      >
         {getBreadcrumbs().map((crumb, index) => (
           <Link
             key={index}
@@ -147,12 +154,13 @@ const Header: React.FC = () => {
             sx={{
               display: 'flex',
               alignItems: 'center',
-              gap: 1,
+              gap: { xs: 0.5, md: 1 },
+              fontSize: { xs: '0.875rem', md: '1rem' },
               fontWeight: index === getBreadcrumbs().length - 1 ? 'bold' : 'normal',
               color: index === getBreadcrumbs().length - 1 ? 'primary' : 'text.secondary',
             }}
           >
-            {crumb.icon && <span style={{ marginRight: '8px' }}>{crumb.icon}</span>}
+            {crumb.icon && <span style={{ marginRight: '4px', fontSize: '1rem' }}>{crumb.icon}</span>}
             {crumb.label}
           </Link>
         ))}

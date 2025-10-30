@@ -109,8 +109,9 @@ const Treatments: React.FC = () => {
   return (
     <Box sx={{
       width: '100%',
-      height: '100%',
-      p: 2,
+      minHeight: '100%',
+      p: { xs: 1, md: 2 },
+      pt: { xs: 0, md: 2 },
       boxSizing: 'border-box',
       minWidth: 0
     }}>

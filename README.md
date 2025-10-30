@@ -1,6 +1,6 @@
 # Patient Management System
 
-A modern offline Windows desktop application built with Tauri, React, Vite, and Joy UI for managing patient records with SQLite database.
+A modern offline cross-platform application built with Tauri, React, Vite, and Joy UI for managing patient records with SQLite database. Available for Windows, Linux, and Android.
 
 ## Features
 
@@ -22,10 +22,11 @@ A modern offline Windows desktop application built with Tauri, React, Vite, and 
 - **TypeScript** - Type-safe development
 
 ### Backend
-- **Tauri 2.0** - Build cross-platform desktop apps with web tech
+- **Tauri 2.0** - Build cross-platform apps (desktop & mobile) with web tech
 - **Rust** - Systems programming language for backend
 - **SQLite** - Self-contained, serverless database
 - **Chrono** - Date and time handling
+- **Tauri Path Plugin** - Cross-platform path handling for file operations
 
 ## Application Structure
 
@@ -134,6 +135,58 @@ The application automatically detects if running in Tauri environment:
 3. **Find your executable**: `src-tauri/target/release/bundle/msi/PatientManagementApp_0.1.0_x64_en-US.msi`
 
 This creates a single `.msi` installer file that users can run to install the app on Windows.
+
+### Building Android APK
+
+The app now supports Android! To build an Android APK:
+
+#### Prerequisites
+1. **Install Rust**: https://rustup.rs/
+2. **Install Android SDK**: 
+   - Install Android Studio: https://developer.android.com/studio
+   - Or install Android SDK command-line tools
+   - Set `ANDROID_HOME` environment variable
+   - Add `$ANDROID_HOME/platform-tools` and `$ANDROID_HOME/tools` to your PATH
+
+3. **Install Android NDK** (usually via Android Studio SDK Manager)
+   - Minimum required: NDK 26.0.10792818 or newer
+   - Set `ANDROID_NDK_ROOT` environment variable
+
+4. **Install Java Development Kit (JDK)**:
+   - JDK 17 or newer (recommended: OpenJDK 17+)
+
+#### Building the APK
+
+1. **Install dependencies** (if not already done):
+   ```bash
+   npm install
+   ```
+
+2. **Build the frontend**:
+   ```bash
+   npm run build
+   ```
+
+3. **Build Android APK**:
+   ```bash
+   # For development/debug APK
+   npm run android:dev
+
+   # For release APK
+   npm run android:build
+   ```
+
+4. **Find your APK**:
+   - Debug: `src-tauri/target/aarch64-linux-android/debug/apk/`
+   - Release: `src-tauri/target/aarch64-linux-android/release/apk/`
+
+#### Android Configuration
+- **Package Name**: `com.patientmanagement.app`
+- **Min SDK**: Android 5.0 (API 21)
+- **Target SDK**: Android 13 (API 33)
+- **Permissions**: Internet, Storage access
+
+**Note**: Building for Android on Windows may require WSL2 (Windows Subsystem for Linux) for best compatibility, though it should work natively with proper Android SDK setup. For faster builds, consider using a Linux environment or GitHub Actions.
 
 ### Database Schema
 ```sql

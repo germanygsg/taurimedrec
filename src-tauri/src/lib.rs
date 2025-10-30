@@ -1,6 +1,12 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+#[cfg(mobile)]
+#[tauri::mobile_entry_point]
+pub fn mobile_main() {
+    main()
+}
+
 use serde::{Deserialize, Serialize};
 use rusqlite::{Connection, Result, params};
 use std::sync::{Arc, Mutex};
@@ -117,8 +123,49 @@ async fn generate_record_number(state: State<'_, AppState>) -> Result<String, St
     Ok(record_number)
 }
 
+#[tauri::command]
+#[cfg(target_os = "android")]
+async fn print_invoice(text: String, job_name: Option<String>) -> Result<String, String> {
+    // On Android, we need to call the Kotlin MainActivity.printInvoice function
+    // Since Rust can't directly call Kotlin, we'll return a special response
+    // that JavaScript will handle by calling the Android interface
+    let job_name_str = job_name.unwrap_or_else(|| "Invoice".to_string());
+    
+    // Return a marker that tells JavaScript to call the Android interface
+    Ok(format!("PRINT:{}:{}", job_name_str, text))
+}
+
+#[tauri::command]
+#[cfg(not(target_os = "android"))]
+async fn print_invoice(_text: String, _job_name: Option<String>) -> Result<String, String> {
+    Err("Printing only available on Android".to_string())
+}
+
 fn init_database() -> Result<Connection> {
-    let conn = Connection::open("patients.db")?;
+    // On Android, try to use the app's data directory
+    // On desktop, use the current working directory
+    let db_path = if cfg!(target_os = "android") {
+        // On Android, use the app's internal storage
+        match std::env::var("HOME") {
+            Ok(home) => {
+                let path = format!("{}/patients.db", home);
+                println!("Using Android database path: {}", path);
+                path
+            }
+            Err(_) => {
+                println!("HOME not set, using default patients.db");
+                "patients.db".to_string()
+            }
+        }
+    } else {
+        "patients.db".to_string()
+    };
+
+    let conn = Connection::open(&db_path)
+        .map_err(|e| {
+            eprintln!("Failed to open database at {}: {}", db_path, e);
+            e
+        })?;
 
     conn.execute(
         "CREATE TABLE IF NOT EXISTS patients (
@@ -132,14 +179,51 @@ fn init_database() -> Result<Connection> {
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )",
         [],
-    )?;
+    )
+    .map_err(|e| {
+        eprintln!("Failed to create patients table: {}", e);
+        e
+    })?;
 
+    println!("Database initialized successfully at: {}", db_path);
     Ok(conn)
 }
 
 #[tokio::main]
 pub async fn main() {
-    let conn = init_database().expect("Failed to initialize database");
+    println!("Starting Patient Management App...");
+
+    let conn = match init_database() {
+        Ok(conn) => {
+            println!("Database initialized successfully");
+            conn
+        }
+        Err(e) => {
+            eprintln!("Fatal: Failed to initialize database: {}", e);
+            // Instead of panicking, we'll create an in-memory database as fallback
+            eprintln!("Falling back to in-memory database");
+            Connection::open(":memory:")
+                .expect("Failed to create in-memory database")
+        }
+    };
+
+    // Ensure the patients table exists even for in-memory database
+    if let Err(e) = conn.execute(
+        "CREATE TABLE IF NOT EXISTS patients (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            record_number TEXT UNIQUE NOT NULL,
+            name TEXT NOT NULL,
+            age INTEGER NOT NULL,
+            address TEXT,
+            phone_number TEXT NOT NULL,
+            initial_diagnosis TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )",
+        [],
+    ) {
+        eprintln!("Failed to create patients table: {}", e);
+    }
+
     let app_state = AppState {
         db: Arc::new(Mutex::new(conn)),
     };
@@ -151,7 +235,8 @@ pub async fn main() {
             add_patient,
             update_patient,
             delete_patient,
-            generate_record_number
+            generate_record_number,
+            print_invoice
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

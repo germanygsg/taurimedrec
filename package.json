@@ -10,7 +10,9 @@
     "preview": "vite preview",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
-    "tauri:build": "tauri build"
+    "tauri:build": "tauri build",
+    "android:dev": "tauri android dev",
+    "android:build": "tauri android build"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -20,6 +22,7 @@
     "@mui/x-charts": "^8.15.0",
     "@tanstack/react-table": "^8.21.3",
     "@tauri-apps/api": "^2.9.0",
+    "adb": "^0.2.0",
     "chrono": "^1.0.5",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

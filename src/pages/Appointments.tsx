@@ -24,6 +24,8 @@ import Checkbox from '@mui/joy/Checkbox';
 import Clear from '@mui/icons-material/Clear';
 import ArrowUpward from '@mui/icons-material/ArrowUpward';
 import ArrowDownward from '@mui/icons-material/ArrowDownward';
+import Select from '@mui/joy/Select';
+import Option from '@mui/joy/Option';
 
 interface VitalSigns {
   bloodPressure: string;
@@ -58,6 +60,8 @@ const Appointments: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Show 10 items per page
   const [dateRange, setDateRange] = useState<{ start: string; end: string }>({ start: '', end: '' });
+  const [selectedDateRange, setSelectedDateRange] = useState<string>('all');
+  const [showCustomDateRange, setShowCustomDateRange] = useState(false);
   const [columnVisibility, setColumnVisibility] = useState({
     patient: true,
     date: true,
@@ -218,6 +222,76 @@ const Appointments: React.FC = () => {
 
   const clearDateRange = () => {
     setDateRange({ start: '', end: '' });
+    setSelectedDateRange('all');
+    setShowCustomDateRange(false);
+  };
+
+  const handleDateRangeChange = (range: string) => {
+    setSelectedDateRange(range);
+    const now = new Date();
+    
+    if (range === 'all') {
+      setDateRange({ start: '', end: '' });
+      setShowCustomDateRange(false);
+    } else if (range === 'today') {
+      const today = now.toISOString().split('T')[0];
+      setDateRange({ start: today, end: today });
+      setShowCustomDateRange(false);
+    } else if (range === 'this_week') {
+      const startOfWeek = new Date(now);
+      startOfWeek.setDate(now.getDate() - now.getDay());
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(startOfWeek.getDate() + 6);
+      setDateRange({ 
+        start: startOfWeek.toISOString().split('T')[0], 
+        end: endOfWeek.toISOString().split('T')[0] 
+      });
+      setShowCustomDateRange(false);
+    } else if (range === 'last_week') {
+      const startOfLastWeek = new Date(now);
+      startOfLastWeek.setDate(now.getDate() - now.getDay() - 7);
+      const endOfLastWeek = new Date(startOfLastWeek);
+      endOfLastWeek.setDate(startOfLastWeek.getDate() + 6);
+      setDateRange({ 
+        start: startOfLastWeek.toISOString().split('T')[0], 
+        end: endOfLastWeek.toISOString().split('T')[0] 
+      });
+      setShowCustomDateRange(false);
+    } else if (range === 'this_month') {
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      setDateRange({ 
+        start: startOfMonth.toISOString().split('T')[0], 
+        end: endOfMonth.toISOString().split('T')[0] 
+      });
+      setShowCustomDateRange(false);
+    } else if (range === 'last_month') {
+      const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+      setDateRange({ 
+        start: startOfLastMonth.toISOString().split('T')[0], 
+        end: endOfLastMonth.toISOString().split('T')[0] 
+      });
+      setShowCustomDateRange(false);
+    } else if (range === 'this_year') {
+      const startOfYear = new Date(now.getFullYear(), 0, 1);
+      const endOfYear = new Date(now.getFullYear(), 11, 31);
+      setDateRange({ 
+        start: startOfYear.toISOString().split('T')[0], 
+        end: endOfYear.toISOString().split('T')[0] 
+      });
+      setShowCustomDateRange(false);
+    } else if (range === 'last_30_days') {
+      const startDate = new Date(now);
+      startDate.setDate(now.getDate() - 30);
+      setDateRange({ 
+        start: startDate.toISOString().split('T')[0], 
+        end: now.toISOString().split('T')[0] 
+      });
+      setShowCustomDateRange(false);
+    } else if (range === 'custom') {
+      setShowCustomDateRange(true);
+    }
   };
 
   // Calculate pagination
@@ -247,47 +321,120 @@ const Appointments: React.FC = () => {
   return (
     <Box sx={{
       width: '100%',
-      height: '100%',
-      p: 2,
+      minHeight: '100%',
+      p: { xs: 1, md: 2 },
+      pt: { xs: 0, md: 2 },
+      pr: { xs: 2, md: 2 },
       boxSizing: 'border-box',
       minWidth: 0
     }}>
-      <Box sx={{ mb: 3 }}>
+      <Box sx={{ mb: 1.5 }}>
         <Typography level="h2">Appointments</Typography>
       </Box>
-
       {error && (
         <Box sx={{ mb: 3 }}>
           <Typography color="danger">{error}</Typography>
         </Box>
       )}
-
-      {/* Search and Filter Bar */}
-      <Box sx={{ mb: 3, display: 'flex', gap: 2, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flex: 1, minWidth: 300 }}>
+      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 1.5, md: 2 }, width: '100%', mb: 1 }}>
+        {/* Box 1: Search left, Date selector right */}
+        <Box sx={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 1, mb: { xs: 1, md: 0 } }}>
           <Input
             startDecorator={<Search sx={{ color: '#ffffff' }} />}
             placeholder="Search appointments by patient name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            sx={{
-              maxWidth: 400,
-              flex: 1,
-              color: '#ffffff',
-              '&::placeholder': {
-                color: '#ffffff !important',
-                opacity: 0.7
-              },
-              '& input': {
-                color: '#ffffff !important'
-              }
-            }}
+            sx={{ maxWidth: 400, width: '100%', color: '#ffffff', fontSize: { xs: 14, sm: 16 }, '&::placeholder': { color: '#ffffff !important', opacity: 0.7 }, '& input': { color: '#ffffff !important' } }}
           />
+          <Box sx={{ ml: 1, display: 'flex', alignItems: 'center', minWidth: 0 }}>
+            <Select
+              value={selectedDateRange}
+              onChange={(_, value) => handleDateRangeChange(value as string)}
+              placeholder="Select Date Range"
+              sx={{
+                height: 40,
+                minHeight: 40,
+                lineHeight: '40px',
+                padding: 0,
+                color: '#ffffff',
+                fontSize: { xs: 13, sm: 16 },
+                width: { xs: 110, sm: 180 },
+                minWidth: 0,
+                '& .MuiInputBase-input': {
+                  height: '40px !important',
+                  minHeight: '40px !important',
+                  lineHeight: '40px !important',
+                  padding: '0 !important',
+                  display: 'flex !important',
+                  alignItems: 'center !important',
+                  justifyContent: 'center !important',
+                  textAlign: 'center !important',
+                  width: '100% !important',
+                  fontSize: { xs: '13px !important', sm: '16px !important' },
+                },
+                '& .MuiSelect-select': {
+                  color: '#ffffff !important',
+                  height: '40px !important',
+                  minHeight: '40px !important',
+                  lineHeight: '40px !important',
+                  padding: '0 !important',
+                  display: 'flex !important',
+                  alignItems: 'center !important',
+                  justifyContent: 'center !important',
+                  textAlign: 'center !important',
+                  width: '100% !important',
+                  fontSize: { xs: '13px !important', sm: '16px !important' },
+                },
+                '& input': {
+                  height: '40px !important',
+                  lineHeight: '40px !important',
+                  textAlign: 'center !important',
+                  padding: '0 !important',
+                },
+              }}
+            >
+              <Option value="all" sx={{ color: '#ffffff' }}>All Time</Option>
+              <Option value="today" sx={{ color: '#ffffff' }}>Today</Option>
+              <Option value="this_week" sx={{ color: '#ffffff' }}>This Week</Option>
+              <Option value="last_week" sx={{ color: '#ffffff' }}>Last Week</Option>
+              <Option value="this_month" sx={{ color: '#ffffff' }}>This Month</Option>
+              <Option value="last_month" sx={{ color: '#ffffff' }}>Last Month</Option>
+              <Option value="last_30_days" sx={{ color: '#ffffff' }}>Last 30 Days</Option>
+              <Option value="this_year" sx={{ color: '#ffffff' }}>This Year</Option>
+              <Option value="custom" sx={{ color: '#ffffff' }}>Custom Range</Option>
+            </Select>
+            {(dateRange.start || dateRange.end) && !showCustomDateRange && (
+              <IconButton
+                size="sm"
+                variant="outlined"
+                color="neutral"
+                onClick={clearDateRange}
+                sx={{ color: '#ffffff', ml: 0.5 }}
+                title="Clear date filter"
+              >
+                <Clear />
+              </IconButton>
+            )}
+          </Box>
+        </Box>
+        {/* Box 2: Columns selector left, New appointment right */}
+        <Box sx={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 1, mt: { xs: 0, md: 0 }, overflowX: { xs: 'auto', md: 'visible' } }}>
           <Dropdown>
             <MenuButton
               variant="outlined"
               startDecorator={<ViewColumn sx={{ color: '#ffffff' }} />}
-              sx={{ borderRadius: 'sm', color: '#ffffff' }}
+              sx={{
+                maxWidth: 160,
+                minWidth: 0,
+                flexShrink: 1,
+                width: 'auto',
+                borderRadius: 'sm',
+                color: '#ffffff',
+                height: 40,
+                minHeight: 40,
+                fontSize: 16,
+                whiteSpace: 'nowrap',
+              }}
             >
               Columns
             </MenuButton>
@@ -336,82 +483,20 @@ const Appointments: React.FC = () => {
               </MenuItem>
             </Menu>
           </Dropdown>
-        </Box>
-
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          {/* Date Range Filter */}
-          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', minWidth: 320 }}>
-            <Typography level="body-sm" sx={{ color: '#ffffff', whiteSpace: 'nowrap' }}>Date Range:</Typography>
-            <Input
-              type="date"
-              placeholder="Start Date"
-              value={dateRange.start}
-              onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
-              sx={{
-                width: 150,
-                color: '#ffffff',
-                '& input': {
-                  color: '#ffffff !important'
-                },
-                '&::placeholder': {
-                  color: '#ffffff !important',
-                  opacity: 0.7
-                }
-              }}
-            />
-            <Typography level="body-sm" sx={{ color: '#ffffff' }}>to</Typography>
-            <Input
-              type="date"
-              placeholder="End Date"
-              value={dateRange.end}
-              onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
-              sx={{
-                width: 150,
-                color: '#ffffff',
-                '& input': {
-                  color: '#ffffff !important'
-                },
-                '&::placeholder': {
-                  color: '#ffffff !important',
-                  opacity: 0.7
-                }
-              }}
-            />
-            {(dateRange.start || dateRange.end) && (
-              <IconButton
-                size="sm"
-                variant="outlined"
-                color="neutral"
-                onClick={clearDateRange}
-                sx={{ color: '#ffffff' }}
-                title="Clear date filter"
-              >
-                <Clear />
-              </IconButton>
-            )}
-          </Box>
-
           <Button
             variant="solid"
             color="primary"
             startDecorator={<Add />}
             onClick={() => navigate('/appointments/new')}
+            sx={{ flexShrink: 0, ml: 1, whiteSpace: 'nowrap', width: { xs: 'fit-content', sm: 'auto' } }}
           >
             New Appointment
           </Button>
         </Box>
       </Box>
-
-      {/* Pagination Info */}
       {totalItems > 0 && (
-        <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography level="body-sm" sx={{ color: '#ffffff' }}>
-            Showing {startIndex + 1}-{Math.min(endIndex, totalItems)} of {totalItems} appointments
-            {(searchTerm || dateRange.start || dateRange.end) && ` (filtered from ${appointments.length} total)`}
-          </Typography>
-          <Typography level="body-sm" sx={{ color: '#ffffff' }}>
-            Page {currentPage} of {totalPages}
-          </Typography>
+        <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1, pr: { xs: 0, md: 0 } }}>
+          {/* REMOVE: 'Page {currentPage} of {totalPages}' Typography from here entirely */}
         </Box>
       )}
 
@@ -440,26 +525,44 @@ const Appointments: React.FC = () => {
             )}
           </Box>
         ) : (
-          <Sheet sx={{ overflow: 'auto', borderRadius: 'sm' }}>
-            <Table
-              aria-labelledby="tableTitle"
-              hoverRow
-              sx={{
-                '& tbody tr:hover': {
-                  backgroundColor: 'background.level2',
-                },
-                '& thead th': {
-                  backgroundColor: 'background.level1',
-                  fontWeight: 'bold',
-                  color: 'text.primary',
-                },
-              }}
-            >
+          <Sheet sx={{ 
+            overflow: 'auto', 
+            borderRadius: 'sm', 
+            overflowX: 'auto',
+            width: '100%',
+            maxWidth: '100%'
+          }}>
+            <Box sx={{ overflowX: 'auto', width: '100%' }}>
+              <Table
+                aria-labelledby="tableTitle"
+                hoverRow
+                sx={{
+                  minWidth: { xs: 'auto', md: 'auto' },
+                  width: { xs: '100%', md: '100%' },
+                  tableLayout: { xs: 'auto', md: 'auto' },
+                  '& tbody tr:hover': { backgroundColor: 'background.level2', },
+                  '& thead th': {
+                    backgroundColor: 'background.level1',
+                    fontWeight: 'bold',
+                    color: 'text.primary',
+                    whiteSpace: 'nowrap',
+                    minWidth: { xs: 'auto', md: 'auto' },
+                    padding: { xs: '8px 12px', md: '12px' },
+                  },
+                  '& tbody td': {
+                    whiteSpace: 'nowrap',
+                    minWidth: { xs: 'auto', md: 'auto' },
+                    padding: { xs: '8px 12px', md: '12px' },
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  },
+                }}
+              >
             <thead>
               <tr>
                 {columnVisibility.date && (
                   <th
-                    style={{ width: 200, padding: '12px', color: '#ffffff', cursor: 'pointer', userSelect: 'none' }}
+                    style={{ padding: '12px', color: '#ffffff', cursor: 'pointer', userSelect: 'none' }}
                     onClick={() => handleSort('date')}
                   >
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -470,11 +573,11 @@ const Appointments: React.FC = () => {
                     </Box>
                   </th>
                 )}
-                {columnVisibility.patient && <th style={{ minWidth: 200, padding: '12px', color: '#ffffff' }}>Patient</th>}
-                {columnVisibility.vitalSigns && <th style={{ minWidth: 250, padding: '12px', color: '#ffffff' }}>Vital Signs</th>}
-                {columnVisibility.treatments && <th style={{ width: 150, padding: '12px', color: '#ffffff' }}>Treatments</th>}
-                {columnVisibility.totalPrice && <th style={{ width: 150, padding: '12px', color: '#ffffff' }}>Total Price</th>}
-                {columnVisibility.actions && <th style={{ width: 200, padding: '12px', color: '#ffffff' }}>Actions</th>}
+                {columnVisibility.patient && <th style={{ padding: '12px', color: '#ffffff' }}>Patient</th>}
+                {columnVisibility.vitalSigns && <th style={{ padding: '12px', color: '#ffffff' }}>Vital Signs</th>}
+                {columnVisibility.treatments && <th style={{ padding: '12px', color: '#ffffff' }}>Treatments</th>}
+                {columnVisibility.totalPrice && <th style={{ padding: '12px', color: '#ffffff' }}>Total Price</th>}
+                {columnVisibility.actions && <th style={{ padding: '12px', color: '#ffffff' }}>Actions</th>}
               </tr>
             </thead>
             <tbody>
@@ -591,20 +694,21 @@ const Appointments: React.FC = () => {
               ))}
             </tbody>
           </Table>
+          </Box>
         </Sheet>
         )}
       </Card>
 
       {/* Pagination Controls */}
       {totalPages > 1 && (
-        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', gap: 1 }}>
+        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', gap: 1, flexWrap: 'wrap', pr: { xs: 0, md: 0 } }}>
           <Button
             variant="outlined"
             onClick={() => setCurrentPage(1)}
             disabled={currentPage === 1}
             sx={{ color: '#ffffff', borderColor: '#ffffff' }}
           >
-            First
+            {'<<'}
           </Button>
           <Button
             variant="outlined"
@@ -612,7 +716,7 @@ const Appointments: React.FC = () => {
             disabled={currentPage === 1}
             sx={{ color: '#ffffff', borderColor: '#ffffff' }}
           >
-            Previous
+            {'<'}
           </Button>
 
           <Typography sx={{
@@ -630,7 +734,7 @@ const Appointments: React.FC = () => {
             disabled={currentPage === totalPages}
             sx={{ color: '#ffffff', borderColor: '#ffffff' }}
           >
-            Next
+            {'>'}
           </Button>
           <Button
             variant="outlined"
@@ -638,9 +742,15 @@ const Appointments: React.FC = () => {
             disabled={currentPage === totalPages}
             sx={{ color: '#ffffff', borderColor: '#ffffff' }}
           >
-            Last
+            {'>>'}
           </Button>
         </Box>
+      )}
+      {totalItems > 0 && (
+        <Typography sx={{ color: '#ffffff', fontSize: '12px', mt: 1, textAlign: 'center', width: '100%' }}>
+          Showing {startIndex + 1}-{Math.min(endIndex, totalItems)} of {totalItems} appointments
+          {(searchTerm || dateRange.start || dateRange.end) && ` (filtered from ${appointments.length} total)`}
+        </Typography>
       )}
     </Box>
   );

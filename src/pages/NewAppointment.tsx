@@ -380,8 +380,8 @@ const NewAppointment: React.FC = () => {
             {/* Patient Selection */}
             <FormControl>
               <FormLabel>Patient *</FormLabel>
-              <Box sx={{ position: 'relative' }}>
-                <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+              <Box sx={{ position: 'relative', width: '100%' }}>
+                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1, mb: 1 }}>
                   <Input
                     value={patientSearch}
                     onChange={(e) => handlePatientSearch(e.target.value)}
@@ -391,7 +391,8 @@ const NewAppointment: React.FC = () => {
                     startDecorator={<Search sx={{ color: '#ffffff' }} />}
                     required
                     sx={{
-                      width: '800px',
+                      width: { xs: '100%', md: '800px' },
+                      maxWidth: '100%',
                       color: '#ffffff',
                       '& input::placeholder': {
                         color: '#ffffff !important',
@@ -408,6 +409,7 @@ const NewAppointment: React.FC = () => {
                     startDecorator={<Refresh />}
                     onClick={reloadData}
                     title="Reload patient data"
+                    sx={{ width: { xs: '100%', sm: 'auto' } }}
                   >
                     Reload
                   </Button>
@@ -469,7 +471,8 @@ const NewAppointment: React.FC = () => {
                 placeholder="Select an operator"
                 required
                 sx={{
-                  width: '800px',
+                  width: { xs: '100%', md: '800px' },
+                  maxWidth: '100%',
                   color: '#ffffff',
                   '&::placeholder': {
                     color: '#ffffff !important',
@@ -498,8 +501,8 @@ const NewAppointment: React.FC = () => {
               <Typography level="h4" sx={{ mb: 2 }}>Vital Signs</Typography>
               <Stack spacing={2}>
                 {/* Blood Pressure and Respiration Rate side by side */}
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                  <FormControl>
+                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
+                  <FormControl sx={{ flex: 1 }}>
                     <FormLabel>Blood Pressure</FormLabel>
                     <Input
                       name="vitalSigns.bloodPressure"
@@ -507,7 +510,7 @@ const NewAppointment: React.FC = () => {
                       onChange={handleInputChange('bloodPressure')}
                       placeholder="e.g., 120/80 (optional)"
                       sx={{
-                        width: '150px',
+                        width: '100%',
                         '& input': {
                           color: '#ffffff !important'
                         },
@@ -519,7 +522,7 @@ const NewAppointment: React.FC = () => {
                     />
                   </FormControl>
 
-                  <FormControl>
+                  <FormControl sx={{ flex: 1 }}>
                     <FormLabel>Respiration Rate (breaths/min)</FormLabel>
                     <Input
                       type="number"
@@ -529,7 +532,7 @@ const NewAppointment: React.FC = () => {
                       placeholder="e.g., 16 (optional)"
                       slotProps={{ input: { min: 0, max: 60 } }}
                       sx={{
-                        width: '150px',
+                        width: '100%',
                         '& input': {
                           color: '#ffffff !important'
                         },
@@ -543,8 +546,8 @@ const NewAppointment: React.FC = () => {
                 </Box>
 
                 {/* Heart Rate and Borg Scale side by side */}
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-end' }}>
-                  <FormControl>
+                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, alignItems: 'flex-end' }}>
+                  <FormControl sx={{ flex: 1 }}>
                     <FormLabel>Heart Rate (bpm)</FormLabel>
                     <Input
                       type="number"
@@ -554,7 +557,7 @@ const NewAppointment: React.FC = () => {
                       placeholder="e.g., 72 (optional)"
                       slotProps={{ input: { min: 0, max: 200 } }}
                       sx={{
-                        width: '150px',
+                        width: '100%',
                         '& input': {
                           color: '#ffffff !important'
                         },
@@ -566,7 +569,7 @@ const NewAppointment: React.FC = () => {
                     />
                   </FormControl>
 
-                  <FormControl>
+                  <FormControl sx={{ flex: 1 }}>
                     <FormLabel>Borg Scale (1-10)</FormLabel>
                     <Input
                       type="number"
@@ -576,7 +579,7 @@ const NewAppointment: React.FC = () => {
                       placeholder="Rate perceived exertion (optional)"
                       slotProps={{ input: { min: 1, max: 10 } }}
                       sx={{
-                        width: '150px',
+                        width: '100%',
                         '& input': {
                           color: '#ffffff !important'
                         },
@@ -605,7 +608,8 @@ const NewAppointment: React.FC = () => {
                 placeholder="Select a treatment"
                 required
                 sx={{
-                  width: '800px',
+                  width: { xs: '100%', md: '800px' },
+                  maxWidth: '100%',
                   color: '#ffffff',
                   '&::placeholder': {
                     color: '#ffffff !important',
@@ -624,7 +628,7 @@ const NewAppointment: React.FC = () => {
               </Select>
               {treatments.length === 0 && (
                 <Typography level="body-xs" color="danger" sx={{ mt: 1 }}>
-                  No treatments available. Please add treatments first.
+                  You don't have any Treatments yet. To add Treatments, go to Settings &gt; Treatments &gt; Add Treatment
                 </Typography>
               )}
             </FormControl>

@@ -185,27 +185,44 @@ const PatientList: React.FC = () => {
   }
 
   return (
-    <Box sx={{
-      width: '100%',
-      height: '100%',
-      p: 2,
-      boxSizing: 'border-box',
-      minWidth: 0
-    }}>
-      <Box sx={{ mb: 3 }}>
+      <Box sx={{
+        width: '100%',
+        minHeight: '100%',
+        p: { xs: 1, md: 2 },
+        pt: { xs: 0, md: 2 },
+        pr: { xs: 2, md: 2 },
+        boxSizing: 'border-box',
+        minWidth: 0
+      }}>
+      <Box sx={{ mb: 1.5 }}>
         <Typography level="h3" sx={{ fontSize: '30px', color: '#ffffff' }}>Patients</Typography>
       </Box>
 
         {/* Search Bar */}
-      <Box sx={{ mb: 3, display: 'flex', gap: 2, alignItems: 'center', justifyContent: 'space-between' }}>
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flex: 1 }}>
+      <Box sx={{ 
+        mb: 1, 
+        display: 'flex', 
+        gap: 2, 
+        alignItems: 'center', 
+        justifyContent: 'space-between',
+        flexDirection: { xs: 'column', sm: 'row' },
+        flexWrap: 'wrap'
+      }}>
+        <Box sx={{ 
+          display: 'flex', 
+          gap: 2, 
+          alignItems: 'center', 
+          flex: 1,
+          width: { xs: '100%', sm: 'auto' },
+          minWidth: 0
+        }}>
           <Input
             startDecorator={<Search sx={{ color: '#ffffff' }} />}
             placeholder="Search patients..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             sx={{
-              maxWidth: 400,
+              maxWidth: { xs: '100%', sm: 400 },
               flex: 1,
               color: '#ffffff',
               '&::placeholder': {
@@ -254,7 +271,11 @@ const PatientList: React.FC = () => {
           color="neutral"
           startDecorator={<Add />}
           onClick={() => navigate('/patients/add')}
-          sx={{ borderRadius: 'sm' }}
+          sx={{ 
+            borderRadius: 'sm',
+            width: { xs: '100%', sm: 'auto' },
+            flexShrink: 0
+          }}
         >
           Add New Patient
         </Button>
@@ -263,55 +284,69 @@ const PatientList: React.FC = () => {
       {/* Pagination Info */}
       {totalItems > 0 && (
         <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography level="body-sm" sx={{ color: '#ffffff' }}>
-            Showing {startIndex + 1}-{Math.min(endIndex, totalItems)} of {totalItems} patients
-            {debouncedSearchTerm && ` (filtered from ${patients.length} total)`}
-          </Typography>
-          <Typography level="body-sm" sx={{ color: '#ffffff' }}>
-            Page {currentPage} of {totalPages}
-          </Typography>
+          {/* REMOVE THIS: Typography level="body-sm" with 'Page {currentPage} of {totalPages}' or similar */}
         </Box>
       )}
 
       <Card>
-        <Sheet sx={{ overflow: 'auto', borderRadius: 'sm' }}>
-          <Table
-            aria-labelledby="tableTitle"
-            hoverRow
-            sx={{
-              '& tbody tr:hover': {
-                backgroundColor: 'background.level2',
-              },
-              '& thead th': {
-                backgroundColor: 'background.level1',
-                fontWeight: 'bold',
-                color: 'text.primary',
-              },
-            }}
-          >
+        <Sheet sx={{ 
+          overflow: 'auto', 
+          borderRadius: 'sm', 
+          overflowX: 'auto',
+          width: '100%',
+          maxWidth: '100%'
+        }}>
+          <Box sx={{ overflowX: 'auto', width: '100%' }}>
+            <Table
+              aria-labelledby="tableTitle"
+              hoverRow
+              sx={{
+                minWidth: { xs: 'auto', md: 'auto' },
+                width: { xs: '100%', md: '100%' },
+                tableLayout: { xs: 'auto', md: 'auto' },
+                '& tbody tr:hover': {
+                  backgroundColor: 'background.level2',
+                },
+                '& thead th': {
+                  backgroundColor: 'background.level1',
+                  fontWeight: 'bold',
+                  color: 'text.primary',
+                  whiteSpace: 'nowrap',
+                  minWidth: { xs: 'auto', md: 'auto' },
+                  padding: { xs: '8px 12px', md: '12px' },
+                },
+                '& tbody td': {
+                  whiteSpace: 'nowrap',
+                  minWidth: { xs: 'auto', md: 'auto' },
+                  padding: { xs: '8px 12px', md: '12px' },
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                },
+              }}
+            >
             <thead>
               <tr>
                 {columnVisibility.record_number && (
-                  <th style={{ width: 150, padding: '12px', color: '#ffffff' }}>Record Number</th>
+                  <th style={{ padding: '12px', color: '#ffffff' }}>Record Number</th>
                 )}
                 {columnVisibility.name && (
-                  <th style={{ minWidth: 200, padding: '12px', color: '#ffffff' }}>Patient Name</th>
+                  <th style={{ padding: '12px', color: '#ffffff' }}>Patient Name</th>
                 )}
                 {columnVisibility.age && (
-                  <th style={{ width: 80, padding: '12px', color: '#ffffff' }}>Age</th>
+                  <th style={{ padding: '12px', color: '#ffffff' }}>Age</th>
                 )}
                 {columnVisibility.address && (
-                  <th style={{ minWidth: 200, padding: '12px', color: '#ffffff' }}>Address</th>
+                  <th style={{ padding: '12px', color: '#ffffff' }}>Address</th>
                 )}
                 {columnVisibility.phone_number && (
-                  <th style={{ width: 150, padding: '12px', color: '#ffffff' }}>Phone Number</th>
+                  <th style={{ padding: '12px', color: '#ffffff' }}>Phone Number</th>
                 )}
                 {columnVisibility.initial_diagnosis && (
-                  <th style={{ minWidth: 200, padding: '12px', color: '#ffffff' }}>Initial Diagnosis</th>
+                  <th style={{ padding: '12px', color: '#ffffff' }}>Initial Diagnosis</th>
                 )}
                 {columnVisibility.date_added && (
                   <th
-                    style={{ width: 120, padding: '12px', color: '#ffffff', cursor: 'pointer', userSelect: 'none' }}
+                    style={{ padding: '12px', color: '#ffffff', cursor: 'pointer', userSelect: 'none' }}
                     onClick={() => handleSort('created_at')}
                   >
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -322,7 +357,7 @@ const PatientList: React.FC = () => {
                     </Box>
                   </th>
                 )}
-                <th style={{ width: 200, padding: '12px', color: '#ffffff' }}>Actions</th>
+                <th style={{ padding: '12px', color: '#ffffff' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -434,19 +469,27 @@ const PatientList: React.FC = () => {
               )}
             </tbody>
           </Table>
+          </Box>
         </Sheet>
       </Card>
 
       {/* Pagination Controls */}
       {totalPages > 1 && (
-        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', gap: 1 }}>
+        <Box sx={{ 
+          mt: 3, 
+          display: 'flex', 
+          justifyContent: 'center', 
+          gap: 1,
+          flexWrap: 'wrap',
+          pr: { xs: 0, md: 0 }
+        }}>
           <Button
             variant="outlined"
             onClick={() => setCurrentPage(1)}
             disabled={currentPage === 1}
             sx={{ color: '#ffffff', borderColor: '#ffffff' }}
           >
-            First
+            {'<<'}
           </Button>
           <Button
             variant="outlined"
@@ -454,7 +497,7 @@ const PatientList: React.FC = () => {
             disabled={currentPage === 1}
             sx={{ color: '#ffffff', borderColor: '#ffffff' }}
           >
-            Previous
+            {'<'}
           </Button>
 
           <Typography sx={{
@@ -472,7 +515,7 @@ const PatientList: React.FC = () => {
             disabled={currentPage === totalPages}
             sx={{ color: '#ffffff', borderColor: '#ffffff' }}
           >
-            Next
+            {'>'}
           </Button>
           <Button
             variant="outlined"
@@ -480,9 +523,16 @@ const PatientList: React.FC = () => {
             disabled={currentPage === totalPages}
             sx={{ color: '#ffffff', borderColor: '#ffffff' }}
           >
-            Last
+            {'>>'}
           </Button>
         </Box>
+      )}
+      {/* Insert 'showing X-Y of N patients' info here, always, even if only 1 page, but below pagination */}
+      {totalItems > 0 && (
+        <Typography sx={{ color: '#ffffff', fontSize: '12px', mt: 1, textAlign: 'center', width: '100%' }}>
+          Showing {startIndex + 1}-{Math.min(endIndex, totalItems)} of {totalItems} patients
+          {debouncedSearchTerm && ` (filtered from ${patients.length} total)`}
+        </Typography>
       )}
     </Box>
   );

@@ -176,8 +176,10 @@ const Dashboard: React.FC = () => {
   return (
     <Box sx={{
       width: '100%',
-      height: '100%',
-      p: 1.5,
+      minHeight: '100%',
+      p: { xs: 1, md: 1.5 },
+      pt: { xs: 0, md: 1.5 },
+      pr: { xs: 2, md: 1.5 },
       boxSizing: 'border-box',
       minWidth: 0
     }}>
@@ -499,13 +501,13 @@ const Dashboard: React.FC = () => {
         startDecorator={<Add />}
         sx={{
           position: 'fixed',
-          bottom: 24,
-          right: 24,
+          bottom: { xs: 84, md: 24 },
+          right: { xs: 16, md: 24 },
           zIndex: 1000,
           borderRadius: 28,
           fontSize: '14px',
           fontWeight: 'bold',
-          padding: '12px 20px',
+          padding: { xs: '10px 16px', md: '12px 20px' },
           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
           transition: 'all 0.3s ease',
           '&:hover': {

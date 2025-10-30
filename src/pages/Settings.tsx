@@ -31,6 +31,7 @@ import List from '@mui/joy/List';
 import ListItem from '@mui/joy/ListItem';
 import ListItemContent from '@mui/joy/ListItemContent';
 import Chip from '@mui/joy/Chip';
+import Sheet from '@mui/joy/Sheet';
 import * as XLSX from 'xlsx';
 import Tabs from '@mui/joy/Tabs';
 import TabList from '@mui/joy/TabList';
@@ -876,8 +877,10 @@ const Settings: React.FC = () => {
   return (
     <Box sx={{
       width: '100%',
-      height: '100%',
-      p: 2,
+      minHeight: '100%',
+      p: { xs: 1, md: 2 },
+      pt: { xs: 0, md: 2 },
+      pr: { xs: 2, md: 2 },
       boxSizing: 'border-box',
       minWidth: 0,
       display: 'flex',
@@ -897,10 +900,10 @@ const Settings: React.FC = () => {
       <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
         <Tabs defaultValue="operators" sx={{ width: '100%', flexGrow: 1 }}>
         <TabList sx={{ borderRadius: 'sm', p: 1, mb: 2 }}>
-          <Tab value="operators" sx={{ color: '#ffffff' }}>Operators</Tab>
-          <Tab value="treatments" sx={{ color: '#ffffff' }}>Treatments</Tab>
-          <Tab value="backup" sx={{ color: '#ffffff' }}>Backup & Restore</Tab>
-          <Tab value="logs" sx={{ color: '#ffffff' }}>Activity Logs</Tab>
+          <Tab value="operators" sx={{ color: '#ffffff', '&:hover': { color: '#d5d6d9' } }}>Operators</Tab>
+          <Tab value="treatments" sx={{ color: '#ffffff', '&:hover': { color: '#d5d6d9' } }}>Treatments</Tab>
+          <Tab value="backup" sx={{ color: '#ffffff', '&:hover': { color: '#d5d6d9' } }}>Backup & Restore</Tab>
+          <Tab value="logs" sx={{ color: '#ffffff', '&:hover': { color: '#d5d6d9' } }}>Activity Logs</Tab>
         </TabList>
 
         <TabPanel value="operators">
@@ -937,64 +940,93 @@ const Settings: React.FC = () => {
                 </Button>
               </Box>
             ) : (
-              <Table
-                stripe="odd"
-                sx={{
-                  '& tbody tr:hover': {
-                    backgroundColor: 'background.level1',
-                  },
-                }}
-              >
-                <thead>
-                  <tr>
-                    <th style={{ width: '30%', color: '#ffffff' }}>Name</th>
-                    <th style={{ width: '30%', color: '#ffffff' }}>Role</th>
-                    <th style={{ width: '30%', color: '#ffffff' }}>Added Date</th>
-                    <th style={{ width: '10%', color: '#ffffff' }}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {operators.map((operator) => (
-                    <tr key={operator.id}>
-                      <td>
-                        <Typography level="body-sm" fontWeight="bold">
-                          {operator.name}
-                        </Typography>
-                      </td>
-                      <td>
-                        <Typography level="body-sm" sx={{ color: '#ffffff' }}>
-                          {operator.role}
-                        </Typography>
-                      </td>
-                      <td>
-                        <Typography level="body-sm" sx={{ color: '#ffffff' }}>
-                          {new Date(operator.created_at).toLocaleDateString()}
-                        </Typography>
-                      </td>
-                      <td>
-                        <Box sx={{ display: 'flex', gap: 1 }}>
-                          <IconButton
-                            size="sm"
-                            variant="outlined"
-                            color="neutral"
-                            onClick={() => handleEditOperator(operator)}
-                          >
-                            <Edit />
-                          </IconButton>
-                          <IconButton
-                            size="sm"
-                            variant="outlined"
-                            color="danger"
-                            onClick={() => handleDeleteOperator(operator)}
-                          >
-                            <Delete />
-                          </IconButton>
-                        </Box>
-                      </td>
+              <Sheet sx={{ 
+                overflow: 'auto', 
+                borderRadius: 'sm', 
+                overflowX: 'auto',
+                width: '100%',
+                maxWidth: '100%'
+              }}>
+                <Box sx={{ overflowX: 'auto', width: '100%' }}>
+                <Table
+                  aria-labelledby="tableTitle"
+                  hoverRow
+                  sx={{
+                    minWidth: { xs: 'auto', md: 'auto' },
+                    width: { xs: '100%', md: '100%' },
+                    tableLayout: { xs: 'auto', md: 'auto' },
+                    '& tbody tr:hover': {
+                      backgroundColor: 'background.level2',
+                    },
+                    '& thead th': {
+                      backgroundColor: 'background.level1',
+                      fontWeight: 'bold',
+                      color: 'text.primary',
+                      whiteSpace: 'nowrap',
+                      minWidth: { xs: 'auto', md: 'auto' },
+                      padding: { xs: '8px 12px', md: '12px' },
+                    },
+                    '& tbody td': {
+                      whiteSpace: 'nowrap',
+                      minWidth: { xs: 'auto', md: 'auto' },
+                      padding: { xs: '8px 12px', md: '12px' },
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    },
+                  }}
+                >
+                  <thead>
+                    <tr>
+                      <th style={{ color: '#ffffff' }}>Name</th>
+                      <th style={{ color: '#ffffff' }}>Role</th>
+                      <th style={{ color: '#ffffff' }}>Added Date</th>
+                      <th style={{ color: '#ffffff' }}>Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </Table>
+                  </thead>
+                  <tbody>
+                    {operators.map((operator) => (
+                      <tr key={operator.id}>
+                        <td>
+                          <Typography level="body-sm" fontWeight="bold">
+                            {operator.name}
+                          </Typography>
+                        </td>
+                        <td>
+                          <Typography level="body-sm" sx={{ color: '#ffffff' }}>
+                            {operator.role}
+                          </Typography>
+                        </td>
+                        <td>
+                          <Typography level="body-sm" sx={{ color: '#ffffff' }}>
+                            {new Date(operator.created_at).toLocaleDateString()}
+                          </Typography>
+                        </td>
+                        <td>
+                          <Box sx={{ display: 'flex', gap: 1 }}>
+                            <IconButton
+                              size="sm"
+                              variant="outlined"
+                              color="neutral"
+                              onClick={() => handleEditOperator(operator)}
+                            >
+                              <Edit />
+                            </IconButton>
+                            <IconButton
+                              size="sm"
+                              variant="outlined"
+                              color="danger"
+                              onClick={() => handleDeleteOperator(operator)}
+                            >
+                              <Delete />
+                            </IconButton>
+                          </Box>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+                </Box>
+              </Sheet>
             )}
           </Card>
         </TabPanel>
@@ -1033,64 +1065,93 @@ const Settings: React.FC = () => {
                 </Button>
               </Box>
             ) : (
-              <Table
-                stripe="odd"
-                sx={{
-                  '& tbody tr:hover': {
-                    backgroundColor: 'background.level1',
-                  },
-                }}
-              >
-                <thead>
-                  <tr>
-                    <th style={{ width: '30%', color: '#ffffff' }}>Treatment Name</th>
-                    <th style={{ width: '40%', color: '#ffffff' }}>Description</th>
-                    <th style={{ width: '20%', color: '#ffffff' }}>Price</th>
-                    <th style={{ width: '10%', color: '#ffffff' }}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {treatments.map((treatment) => (
-                    <tr key={treatment.id}>
-                      <td>
-                        <Typography level="body-sm" fontWeight="bold">
-                          {treatment.name}
-                        </Typography>
-                      </td>
-                      <td>
-                        <Typography level="body-sm" sx={{ color: '#ffffff' }}>
-                          {treatment.description}
-                        </Typography>
-                      </td>
-                      <td>
-                        <Typography level="body-sm" color="success" fontWeight="bold">
-                          {formatCurrency(treatment.price)}
-                        </Typography>
-                      </td>
-                      <td>
-                        <Box sx={{ display: 'flex', gap: 1 }}>
-                          <IconButton
-                            size="sm"
-                            variant="outlined"
-                            color="neutral"
-                            onClick={() => handleEditTreatment(treatment)}
-                          >
-                            <Edit />
-                          </IconButton>
-                          <IconButton
-                            size="sm"
-                            variant="outlined"
-                            color="danger"
-                            onClick={() => handleDeleteTreatment(treatment)}
-                          >
-                            <Delete />
-                          </IconButton>
-                        </Box>
-                      </td>
+              <Sheet sx={{ 
+                overflow: 'auto', 
+                borderRadius: 'sm', 
+                overflowX: 'auto',
+                width: '100%',
+                maxWidth: '100%'
+              }}>
+                <Box sx={{ overflowX: 'auto', width: '100%' }}>
+                <Table
+                  aria-labelledby="tableTitle"
+                  hoverRow
+                  sx={{
+                    minWidth: { xs: 'auto', md: 'auto' },
+                    width: { xs: '100%', md: '100%' },
+                    tableLayout: { xs: 'auto', md: 'auto' },
+                    '& tbody tr:hover': {
+                      backgroundColor: 'background.level2',
+                    },
+                    '& thead th': {
+                      backgroundColor: 'background.level1',
+                      fontWeight: 'bold',
+                      color: 'text.primary',
+                      whiteSpace: 'nowrap',
+                      minWidth: { xs: 'auto', md: 'auto' },
+                      padding: { xs: '8px 12px', md: '12px' },
+                    },
+                    '& tbody td': {
+                      whiteSpace: 'nowrap',
+                      minWidth: { xs: 'auto', md: 'auto' },
+                      padding: { xs: '8px 12px', md: '12px' },
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    },
+                  }}
+                >
+                  <thead>
+                    <tr>
+                      <th style={{ color: '#ffffff' }}>Treatment Name</th>
+                      <th style={{ color: '#ffffff' }}>Description</th>
+                      <th style={{ color: '#ffffff' }}>Price</th>
+                      <th style={{ color: '#ffffff' }}>Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </Table>
+                  </thead>
+                  <tbody>
+                    {treatments.map((treatment) => (
+                      <tr key={treatment.id}>
+                        <td>
+                          <Typography level="body-sm" fontWeight="bold">
+                            {treatment.name}
+                          </Typography>
+                        </td>
+                        <td>
+                          <Typography level="body-sm" sx={{ color: '#ffffff' }}>
+                            {treatment.description}
+                          </Typography>
+                        </td>
+                        <td>
+                          <Typography level="body-sm" color="success" fontWeight="bold">
+                            {formatCurrency(treatment.price)}
+                          </Typography>
+                        </td>
+                        <td>
+                          <Box sx={{ display: 'flex', gap: 1 }}>
+                            <IconButton
+                              size="sm"
+                              variant="outlined"
+                              color="neutral"
+                              onClick={() => handleEditTreatment(treatment)}
+                            >
+                              <Edit />
+                            </IconButton>
+                            <IconButton
+                              size="sm"
+                              variant="outlined"
+                              color="danger"
+                              onClick={() => handleDeleteTreatment(treatment)}
+                            >
+                              <Delete />
+                            </IconButton>
+                          </Box>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+                </Box>
+              </Sheet>
             )}
           </Card>
         </TabPanel>

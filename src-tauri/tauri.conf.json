@@ -39,6 +39,11 @@
         "type": "embedBootstrapper"
       }
     },
-    "createUpdaterArtifacts": false
-  }
+    "createUpdaterArtifacts": false,
+    "android": {
+      "minSdkVersion": 21,
+      "versionCode": 1
+    }
+  },
+  "plugins": {}
 }

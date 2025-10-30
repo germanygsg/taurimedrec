@@ -1,4 +1,22 @@
+html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
 :root {
+  /* Safe area insets for edge-to-edge (Android/iOS) */
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
+
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -24,15 +42,61 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
+  /* Respect device safe areas so content isn't obscured by system bars */
+  padding-top: var(--safe-area-inset-top);
+  padding-right: var(--safe-area-inset-right);
+  padding-bottom: var(--safe-area-inset-bottom);
+  padding-left: var(--safe-area-inset-left);
+  display: block;
   min-width: 320px;
   min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Mobile optimizations for 16:9 portrait */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px; /* Slightly smaller base font for mobile */
+  }
+  
+  /* Optimize for portrait mobile screens */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Improve touch targets */
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Optimize scrolling on mobile */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Better text rendering on mobile */
+  body, input, textarea, select {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 }
 
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+}
+
+/* Optimize for 16:9 aspect ratio portrait screens (typical 360x640 or 400x854) */
+@media (max-width: 480px) {
+  body {
+    font-size: 13px;
+  }
+  
+  h1 {
+    font-size: 2em;
+    line-height: 1.2;
+  }
 }
 
 button {
@@ -54,6 +118,29 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+
+/* Root element styling */
+#root {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100vw;
+  min-height: 100vh;
+  display: block;
+  position: relative;
+}
+
+/* Utility classes to opt-in per-component safe area handling if needed */
+.safe-area-padding {
+  padding-top: var(--safe-area-inset-top);
+  padding-right: var(--safe-area-inset-right);
+  padding-bottom: var(--safe-area-inset-bottom);
+  padding-left: var(--safe-area-inset-left);
+}
+
+.safe-area-padding-top { padding-top: var(--safe-area-inset-top); }
+.safe-area-padding-bottom { padding-bottom: var(--safe-area-inset-bottom); }
+.safe-area-padding-left { padding-left: var(--safe-area-inset-left); }
+.safe-area-padding-right { padding-right: var(--safe-area-inset-right); }
 
 /* Global placeholder styling */
 ::placeholder {
@@ -96,5 +183,25 @@ button:focus-visible {
   button {
     background-color: #1d293d;
     color: #ffffff;
+  }
+}
+
+@media screen and (max-aspect-ratio: 9/16) {
+  .status-bar-spacer {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100vw;
+    min-height: 30px;
+    background: #181818;
+    z-index: 999;
+    display: block;
+  }
+  .main-content {
+    padding-bottom: 25px !important;
+  }
+  .bottom-nav {
+    min-height: calc(var(--bottom-nav-height, 64px) + 25px);
   }
 }

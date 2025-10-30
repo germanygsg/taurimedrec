@@ -32,7 +32,8 @@ const Invoices: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Show 10 items per page
   const [dateRange, setDateRange] = useState<{ start: string; end: string }>({ start: '', end: '' });
-  const [quickDateRange, setQuickDateRange] = useState<string>('');
+  const [selectedDateRange, setSelectedDateRange] = useState<string>('all');
+  const [showCustomDateRange, setShowCustomDateRange] = useState(false);
   const [sortField, setSortField] = useState<keyof Invoice | null>('date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
@@ -130,49 +131,79 @@ const Invoices: React.FC = () => {
   // Reset to page 1 when search term or date range changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, dateRange, quickDateRange, sortField, sortDirection]);
+  }, [searchTerm, dateRange, sortField, sortDirection]);
 
   const clearDateRange = () => {
     setDateRange({ start: '', end: '' });
-    setQuickDateRange('');
+    setSelectedDateRange('all');
+    setShowCustomDateRange(false);
   };
 
-  const handleQuickDateRangeChange = (value: string | null) => {
-    setQuickDateRange(value || '');
-    if (value) {
-      const today = new Date();
-      let startDate = new Date();
-      let endDate = new Date();
-
-      switch (value) {
-        case 'today':
-          startDate.setHours(0, 0, 0, 0);
-          endDate.setHours(23, 59, 59, 999);
-          break;
-        case 'this_month':
-          startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-          endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999);
-          break;
-        case 'last_30_days':
-          startDate = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
-          startDate.setHours(0, 0, 0, 0);
-          endDate.setHours(23, 59, 59, 999);
-          break;
-        case 'this_year':
-          startDate = new Date(today.getFullYear(), 0, 1);
-          endDate = new Date(today.getFullYear(), 11, 31, 23, 59, 59, 999);
-          break;
-        default:
-          setDateRange({ start: '', end: '' });
-          return;
-      }
-
-      setDateRange({
-        start: startDate.toISOString().split('T')[0],
-        end: endDate.toISOString().split('T')[0]
-      });
-    } else {
+  const handleDateRangeChange = (range: string) => {
+    setSelectedDateRange(range);
+    const now = new Date();
+    
+    if (range === 'all') {
       setDateRange({ start: '', end: '' });
+      setShowCustomDateRange(false);
+    } else if (range === 'today') {
+      const today = now.toISOString().split('T')[0];
+      setDateRange({ start: today, end: today });
+      setShowCustomDateRange(false);
+    } else if (range === 'this_week') {
+      const startOfWeek = new Date(now);
+      startOfWeek.setDate(now.getDate() - now.getDay());
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(startOfWeek.getDate() + 6);
+      setDateRange({ 
+        start: startOfWeek.toISOString().split('T')[0], 
+        end: endOfWeek.toISOString().split('T')[0] 
+      });
+      setShowCustomDateRange(false);
+    } else if (range === 'last_week') {
+      const startOfLastWeek = new Date(now);
+      startOfLastWeek.setDate(now.getDate() - now.getDay() - 7);
+      const endOfLastWeek = new Date(startOfLastWeek);
+      endOfLastWeek.setDate(startOfLastWeek.getDate() + 6);
+      setDateRange({ 
+        start: startOfLastWeek.toISOString().split('T')[0], 
+        end: endOfLastWeek.toISOString().split('T')[0] 
+      });
+      setShowCustomDateRange(false);
+    } else if (range === 'this_month') {
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      setDateRange({ 
+        start: startOfMonth.toISOString().split('T')[0], 
+        end: endOfMonth.toISOString().split('T')[0] 
+      });
+      setShowCustomDateRange(false);
+    } else if (range === 'last_month') {
+      const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+      setDateRange({ 
+        start: startOfLastMonth.toISOString().split('T')[0], 
+        end: endOfLastMonth.toISOString().split('T')[0] 
+      });
+      setShowCustomDateRange(false);
+    } else if (range === 'last_30_days') {
+      const startDate = new Date(now);
+      startDate.setDate(now.getDate() - 30);
+      setDateRange({ 
+        start: startDate.toISOString().split('T')[0], 
+        end: now.toISOString().split('T')[0] 
+      });
+      setShowCustomDateRange(false);
+    } else if (range === 'this_year') {
+      const startOfYear = new Date(now.getFullYear(), 0, 1);
+      const endOfYear = new Date(now.getFullYear(), 11, 31);
+      setDateRange({ 
+        start: startOfYear.toISOString().split('T')[0], 
+        end: endOfYear.toISOString().split('T')[0] 
+      });
+      setShowCustomDateRange(false);
+    } else if (range === 'custom') {
+      setShowCustomDateRange(true);
     }
   };
 
@@ -249,12 +280,14 @@ const Invoices: React.FC = () => {
   return (
     <Box sx={{
       width: '100%',
-      height: '100%',
-      p: 2,
+      minHeight: '100%',
+      p: { xs: 1, md: 2 },
+      pt: { xs: 0, md: 2 },
+      pr: { xs: 2, md: 2 },
       boxSizing: 'border-box',
       minWidth: 0
     }}>
-      <Box sx={{ mb: 3 }}>
+      <Box sx={{ mb: 1.5 }}>
         <Typography level="h2" sx={{ color: '#ffffff' }}>Invoices</Typography>
       </Box>
 
@@ -265,7 +298,7 @@ const Invoices: React.FC = () => {
       )}
 
       {/* Search and Filter Bar */}
-      <Box sx={{ mb: 3, display: 'flex', gap: 2, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+      <Box sx={{ mb: 1, display: 'flex', gap: 2, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flex: 1, minWidth: 300 }}>
           <Input
             startDecorator={<Search sx={{ color: '#ffffff' }} />}
@@ -285,64 +318,119 @@ const Invoices: React.FC = () => {
               }
             }}
           />
+        </Box>
+
+        {/* Date Range Filter */}
+        <Box sx={{ 
+          display: 'flex', 
+          gap: 1, 
+          alignItems: 'center',
+          flexDirection: { xs: 'column', sm: 'row' },
+          width: { xs: '100%', sm: 'auto' },
+          flexWrap: 'wrap'
+        }}>
           <Select
-            value={quickDateRange}
-            onChange={(_, value) => handleQuickDateRangeChange(value)}
-            placeholder="Show by..."
+            value={selectedDateRange}
+            onChange={(_, value) => handleDateRangeChange(value as string)}
+            placeholder="Select Date Range"
             sx={{
-              minWidth: 150,
+              minWidth: { xs: '100%', sm: 180 },
               color: '#ffffff',
               '& .MuiSelect-select': {
                 color: '#ffffff !important'
               }
             }}
           >
+            <Option value="all" sx={{ color: '#ffffff' }}>All Time</Option>
             <Option value="today" sx={{ color: '#ffffff' }}>Today</Option>
+            <Option value="this_week" sx={{ color: '#ffffff' }}>This Week</Option>
+            <Option value="last_week" sx={{ color: '#ffffff' }}>Last Week</Option>
             <Option value="this_month" sx={{ color: '#ffffff' }}>This Month</Option>
+            <Option value="last_month" sx={{ color: '#ffffff' }}>Last Month</Option>
             <Option value="last_30_days" sx={{ color: '#ffffff' }}>Last 30 Days</Option>
             <Option value="this_year" sx={{ color: '#ffffff' }}>This Year</Option>
+            <Option value="custom" sx={{ color: '#ffffff' }}>Custom Range</Option>
           </Select>
-        </Box>
 
-        {/* Date Range Filter */}
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', minWidth: 320 }}>
-          <Typography level="body-sm" sx={{ color: '#ffffff', whiteSpace: 'nowrap' }}>Date Range:</Typography>
-          <Input
-            type="date"
-            placeholder="Start Date"
-            value={dateRange.start}
-            onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
-            sx={{
-              width: 150,
-              color: '#ffffff',
-              '& input': {
-                color: '#ffffff !important'
-              },
-              '&::placeholder': {
-                color: '#ffffff !important',
-                opacity: 0.7
-              }
-            }}
-          />
-          <Typography level="body-sm" sx={{ color: '#ffffff' }}>to</Typography>
-          <Input
-            type="date"
-            placeholder="End Date"
-            value={dateRange.end}
-            onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
-            sx={{
-              width: 150,
-              color: '#ffffff',
-              '& input': {
-                color: '#ffffff !important'
-              },
-              '&::placeholder': {
-                color: '#ffffff !important',
-                opacity: 0.7
-              }
-            }}
-          />
-          {(dateRange.start || dateRange.end) && (
+          {showCustomDateRange && (
+            <Box sx={{ 
+              display: 'flex', 
+              gap: 1, 
+              alignItems: 'center',
+              width: { xs: '100%', sm: 'auto' },
+              flexWrap: 'wrap'
+            }}>
+              <Input
+                type="date"
+                placeholder="Start Date"
+                value={dateRange.start}
+                onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
+                slotProps={{
+                  input: {
+                    type: 'date',
+                    min: '2000-01-01',
+                    max: '2100-12-31'
+                  }
+                }}
+                sx={{
+                  width: { xs: '100%', sm: 150 },
+                  flex: { xs: 1, sm: 0 },
+                  color: '#ffffff',
+                  '& input': {
+                    color: '#ffffff !important',
+                    '&::-webkit-calendar-picker-indicator': {
+                      filter: 'invert(1)',
+                      cursor: 'pointer'
+                    },
+                    '&::-moz-calendar-picker-indicator': {
+                      filter: 'invert(1)',
+                      cursor: 'pointer'
+                    }
+                  },
+                  '&::placeholder': {
+                    color: '#ffffff !important',
+                    opacity: 0.7
+                  }
+                }}
+              />
+              <Typography level="body-sm" sx={{ color: '#ffffff' }}>to</Typography>
+              <Input
+                type="date"
+                placeholder="End Date"
+                value={dateRange.end}
+                onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
+                slotProps={{
+                  input: {
+                    type: 'date',
+                    min: dateRange.start || '2000-01-01',
+                    max: '2100-12-31'
+                  }
+                }}
+                sx={{
+                  width: { xs: '100%', sm: 150 },
+                  flex: { xs: 1, sm: 0 },
+                  color: '#ffffff',
+                  '& input': {
+                    color: '#ffffff !important',
+                    '&::-webkit-calendar-picker-indicator': {
+                      filter: 'invert(1)',
+                      cursor: 'pointer'
+                    },
+                    '&::-moz-calendar-picker-indicator': {
+                      filter: 'invert(1)',
+                      cursor: 'pointer'
+                    }
+                  },
+                  '&::placeholder': {
+                    color: '#ffffff !important',
+                    opacity: 0.7
+                  }
+                }}
+              />
+            </Box>
+          )}
+
+          {(dateRange.start || dateRange.end) && !showCustomDateRange && (
             <IconButton
               size="sm"
               variant="outlined"
@@ -359,14 +447,11 @@ const Invoices: React.FC = () => {
 
       {/* Pagination Info */}
       {totalItems > 0 && (
-        <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1, pr: { xs: 0, md: 0 } }}>
           <Typography level="body-sm" sx={{ color: '#ffffff' }}>
-            Showing {startIndex + 1}-{Math.min(endIndex, totalItems)} of {totalItems} invoices
-            {(searchTerm || dateRange.start || dateRange.end) && ` (filtered from ${invoices.length} total)`}
+            {/* REMOVE THIS: Showing ... */}
           </Typography>
-          <Typography level="body-sm" sx={{ color: '#ffffff' }}>
-            Page {currentPage} of {totalPages}
-          </Typography>
+          {/* REMOVE THIS: Page ... */}
         </Box>
       )}
 
@@ -395,21 +480,41 @@ const Invoices: React.FC = () => {
             )}
           </Box>
         ) : (
-          <Sheet sx={{ overflow: 'auto', borderRadius: 'sm' }}>
-            <Table
-              aria-labelledby="tableTitle"
-              hoverRow
-              sx={{
-                '& tbody tr:hover': {
-                  backgroundColor: 'background.level2',
-                },
-                '& thead th': {
-                  backgroundColor: 'background.level1',
-                  fontWeight: 'bold',
-                  color: 'text.primary',
-                },
-              }}
-            >
+          <Sheet sx={{ 
+            overflow: 'auto', 
+            borderRadius: 'sm', 
+            overflowX: 'auto',
+            width: '100%',
+            maxWidth: '100%'
+          }}>
+            <Box sx={{ overflowX: 'auto', width: '100%' }}>
+              <Table
+                aria-labelledby="tableTitle"
+                hoverRow
+                sx={{
+                  minWidth: { xs: '800px', md: 'auto' },
+                  width: { xs: 'max-content', md: '100%' },
+                  tableLayout: { xs: 'auto', md: 'auto' },
+                  '& tbody tr:hover': {
+                    backgroundColor: 'background.level2',
+                  },
+                  '& thead th': {
+                    backgroundColor: 'background.level1',
+                    fontWeight: 'bold',
+                    color: 'text.primary',
+                    whiteSpace: 'nowrap',
+                    minWidth: { xs: '120px', md: 'auto' },
+                    padding: { xs: '8px 12px', md: '12px' },
+                  },
+                  '& tbody td': {
+                    whiteSpace: 'nowrap',
+                    minWidth: { xs: '120px', md: 'auto' },
+                    padding: { xs: '8px 12px', md: '12px' },
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  },
+                }}
+              >
             <thead>
               <tr>
                 <th style={{ width: 150, padding: '12px', color: '#ffffff' }}>Invoice #</th>
@@ -549,20 +654,21 @@ const Invoices: React.FC = () => {
               ))}
             </tbody>
           </Table>
-        </Sheet>
+            </Box>
+          </Sheet>
         )}
       </Card>
 
       {/* Pagination Controls */}
       {totalPages > 1 && (
-        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', gap: 1 }}>
+        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', gap: 1, flexWrap: 'wrap', pr: { xs: 0, md: 0 } }}>
           <Button
             variant="outlined"
             onClick={() => setCurrentPage(1)}
             disabled={currentPage === 1}
             sx={{ color: '#ffffff', borderColor: '#ffffff' }}
           >
-            First
+            {'<<'}
           </Button>
           <Button
             variant="outlined"
@@ -570,7 +676,7 @@ const Invoices: React.FC = () => {
             disabled={currentPage === 1}
             sx={{ color: '#ffffff', borderColor: '#ffffff' }}
           >
-            Previous
+            {'<'}
           </Button>
 
           <Typography sx={{
@@ -588,7 +694,7 @@ const Invoices: React.FC = () => {
             disabled={currentPage === totalPages}
             sx={{ color: '#ffffff', borderColor: '#ffffff' }}
           >
-            Next
+            {'>'}
           </Button>
           <Button
             variant="outlined"
@@ -596,9 +702,16 @@ const Invoices: React.FC = () => {
             disabled={currentPage === totalPages}
             sx={{ color: '#ffffff', borderColor: '#ffffff' }}
           >
-            Last
+            {'>>'}
           </Button>
         </Box>
+      )}
+      {/* Add summary info here always, after pagination, even for single page */}
+      {totalItems > 0 && (
+        <Typography sx={{ color: '#ffffff', fontSize: '12px', mt: 1, textAlign: 'center', width: '100%' }}>
+          Showing {startIndex + 1}-{Math.min(endIndex, totalItems)} of {totalItems} invoices
+          {(searchTerm || dateRange.start || dateRange.end) && ` (filtered from ${invoices.length} total)`}
+        </Typography>
       )}
     </Box>
   );
