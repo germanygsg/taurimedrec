@@ -20,6 +20,17 @@ import ShareIcon from '@mui/icons-material/Share';
 import { Invoice } from '../types';
 import { Patient } from '../types';
 
+interface ReceiptConfig {
+  header: string;
+  footer: string;
+}
+
+const defaultHeader = `BSP CENTER PHYSIOTHERAPY CLINIC
+Ruko Rose Garden 7 No.11, JakaSetia, Bekasi Selatan 17148`;
+
+const defaultFooter = `Thank you for your visit!
+Semoga kesehatan selalu menyertai anda`;
+
 const InvoiceDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -31,11 +42,16 @@ const InvoiceDetails: React.FC = () => {
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [invoiceTextForShare, setInvoiceTextForShare] = useState('');
   const [copySuccess, setCopySuccess] = useState(false);
+  const [receiptConfig, setReceiptConfig] = useState<ReceiptConfig>({
+    header: defaultHeader,
+    footer: defaultFooter
+  });
 
   useEffect(() => {
     if (id) {
       loadInvoice(parseInt(id));
     }
+    loadReceiptConfig();
   }, [id]);
 
   const loadInvoice = async (invoiceId: number) => {
@@ -73,6 +89,18 @@ const InvoiceDetails: React.FC = () => {
       }
     } catch (error) {
       console.error('Error loading patient:', error);
+    }
+  };
+
+  const loadReceiptConfig = () => {
+    try {
+      const storedConfig = localStorage.getItem('receipt_config');
+      if (storedConfig) {
+        const config: ReceiptConfig = JSON.parse(storedConfig);
+        setReceiptConfig(config);
+      }
+    } catch (error) {
+      console.error('Error loading receipt config:', error);
     }
   };
 
@@ -142,8 +170,7 @@ const InvoiceDetails: React.FC = () => {
       return text;
     }).join('\n');
 
-    return `BSP CENTER PHYSIOTHERAPY CLINIC
-Ruko Rose Garden 7 No.11, JakaSetia, Bekasi Selatan 17148
+    return `${receiptConfig.header}
 
 TREATMENT RECEIPT
 
@@ -166,8 +193,7 @@ STATUS: ${invoice.status.toUpperCase()}
 
 ${'═'.repeat(50)}
 
-Thank you for your visit!
-Semoga kesehatan selalu menyertai anda`;
+${receiptConfig.footer}`;
   };
 
   const handleCopyToClipboard = async () => {
@@ -345,8 +371,10 @@ Semoga kesehatan selalu menyertai anda`;
     // Store original body content
     const originalContent = document.body.innerHTML;
 
-    const printContent = `<div style="text-align: center;">BSP CENTER PHYSIOTHERAPY CLINIC</div>
-<div style="text-align: center; font-size: 10px;">Ruko Rose Garden 7 No.11, JakaSetia, Bekasi Selatan 17148</div>
+    const headerLines = receiptConfig.header.split('\n');
+    const footerLines = receiptConfig.footer.split('\n');
+
+    const printContent = `${headerLines.map(line => `<div style="text-align: center;">${line}</div>`).join('\n')}
 <div style="text-align: center;">TREATMENT RECEIPT</div>
 _____________________________________________________________
 DATE: ${formatDateForPrint(invoice.date)}
@@ -372,8 +400,7 @@ INVOICE NUMBER: ${invoice.invoiceNumber}
 OPERATOR: ${invoice.operatorName}
 STATUS: ${invoice.status.toUpperCase() === 'PAID' ? 'PAID' : invoice.status.toUpperCase()}
 
-<div style="text-align: center; font-size: 10px;">Thank you for your visit!</div>
-<div style="text-align: center; font-size: 10px;">Semoga kesehatan selalu menyertai anda</div>`;
+${footerLines.map(line => `<div style="text-align: center; font-size: 10px;">${line}</div>`).join('\n')}`;
 
     // Replace body content with print content  
     document.body.innerHTML = `<div style="font-family: monospace; font-size: 12px; line-height: 1.2; color: black; background: white; margin: 0; padding: 0; white-space: pre; letter-spacing: 1px; word-wrap: break-word; overflow-wrap: break-word;">${printContent}</div>`;
@@ -545,12 +572,19 @@ STATUS: ${invoice.status.toUpperCase() === 'PAID' ? 'PAID' : invoice.status.toUp
       >
         {/* Clinic Header */}
         <Box sx={{ textAlign: 'center', mb: 3 }}>
-          <Typography level="h3" sx={{ fontWeight: 'bold', mb: 1, color: '#000000' }}>
-            BSP CENTER PHYSIOTHERAPY CLINIC
-          </Typography>
-          <Typography level="body-sm" sx={{ color: '#000000' }}>
-            Ruko Rose Garden 7 No.11, JakaSetia, Bekasi Selatan 17148
-          </Typography>
+          {receiptConfig.header.split('\n').map((line, index) => (
+            <Typography
+              key={index}
+              level={index === 0 ? "h3" : "body-sm"}
+              sx={{
+                fontWeight: index === 0 ? 'bold' : 'normal',
+                mb: index === 0 ? 1 : 0.5,
+                color: '#000000'
+              }}
+            >
+              {line}
+            </Typography>
+          ))}
         </Box>
 
         <Divider sx={{ borderColor: '#000000', mb: 3 }} />
@@ -631,13 +665,21 @@ STATUS: ${invoice.status.toUpperCase() === 'PAID' ? 'PAID' : invoice.status.toUp
         <Divider sx={{ borderColor: '#000000', mb: 2 }} />
 
         {/* Thank You Message */}
-        <Typography level="body-sm" sx={{ textAlign: 'center', mb: 2, fontWeight: 'bold', color: '#000000' }}>
-          Thank you for your visit!
-        </Typography>
-
-        <Typography level="body-sm" sx={{ textAlign: 'center', fontStyle: 'italic', color: '#000000' }}>
-          Semoga kesehatan selalu menyertai anda
-        </Typography>
+        {receiptConfig.footer.split('\n').map((line, index) => (
+          <Typography
+            key={index}
+            level="body-sm"
+            sx={{
+              textAlign: 'center',
+              fontWeight: index === 0 ? 'bold' : 'normal',
+              fontStyle: index === 0 ? 'normal' : 'italic',
+              mb: index === 0 ? 2 : 0,
+              color: '#000000'
+            }}
+          >
+            {line}
+          </Typography>
+        ))}
       </Box>
 
       {/* Invoice Status Control */}

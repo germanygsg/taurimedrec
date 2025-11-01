@@ -19,6 +19,12 @@ import AppointmentDetails from './pages/AppointmentDetails';
 import Invoices from './pages/Invoices';
 import InvoiceDetails from './pages/InvoiceDetails';
 import Reports from './pages/Reports';
+import OperatorSettings from './pages/settings/OperatorSettings';
+import TreatmentSettings from './pages/settings/TreatmentSettings';
+import BackupRestoreSettings from './pages/settings/BackupRestoreSettings';
+import ActivityLogsSettings from './pages/settings/ActivityLogsSettings';
+import ReceiptSettings from './pages/settings/ReceiptSettings';
+import CustomExaminationsSettings from './pages/settings/CustomExaminationsSettings';
 import { createSampleLogs } from './utils/sampleLogs';
 
 const theme = extendTheme({
@@ -155,6 +161,12 @@ function App() {
               <Route path="invoices/:id" element={<InvoiceDetails />} />
               <Route path="reports" element={<Reports />} />
               <Route path="settings" element={<Settings />} />
+              <Route path="settings/operators" element={<OperatorSettings />} />
+              <Route path="settings/treatments" element={<TreatmentSettings />} />
+              <Route path="settings/backup" element={<BackupRestoreSettings />} />
+              <Route path="settings/logs" element={<ActivityLogsSettings />} />
+              <Route path="settings/receipt" element={<ReceiptSettings />} />
+              <Route path="settings/custom-examinations" element={<CustomExaminationsSettings />} />
             </Route>
           </Routes>
           </Router>

@@ -26,6 +26,12 @@ interface Treatment {
   price: number;
 }
 
+interface CustomExamination {
+  id: number;
+  name: string;
+  unit: string;
+}
+
 interface Operator {
   id: number;
   name: string;
@@ -37,6 +43,7 @@ interface VitalSigns {
   respirationRate: string;
   heartRate: string;
   borgScale: string;
+  [key: string]: string | number; // Allow dynamic properties for custom examinations
 }
 
 interface AppointmentData {
@@ -53,6 +60,7 @@ const NewAppointment: React.FC = () => {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [operators, setOperators] = useState<Operator[]>([]);
   const [treatments, setTreatments] = useState<Treatment[]>([]);
+  const [customExaminations, setCustomExaminations] = useState<CustomExamination[]>([]);
   const [patientSearch, setPatientSearch] = useState('');
   const [showPatientDropdown, setShowPatientDropdown] = useState(false);
     const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
@@ -70,6 +78,24 @@ const NewAppointment: React.FC = () => {
     },
     selectedTreatment: null
   });
+
+  // Initialize custom examinations in vital signs when they are loaded
+  useEffect(() => {
+    if (customExaminations.length > 0) {
+      setFormData(prev => {
+        const updatedVitalSigns = { ...prev.vitalSigns };
+        customExaminations.forEach(exam => {
+          if (!(exam.id in updatedVitalSigns)) {
+            updatedVitalSigns[`custom_${exam.id}`] = '';
+          }
+        });
+        return {
+          ...prev,
+          vitalSigns: updatedVitalSigns
+        };
+      });
+    }
+  }, [customExaminations]);
 
   useEffect(() => {
     loadData();
@@ -108,6 +134,13 @@ const NewAppointment: React.FC = () => {
       const storedTreatments: Treatment[] = JSON.parse(treatmentsRaw || '[]');
       console.log('Loaded treatments:', storedTreatments);
       setTreatments(storedTreatments);
+
+      // Load custom examinations
+      const customExaminationsRaw = localStorage.getItem('custom_examinations');
+      console.log('Raw custom examinations data:', customExaminationsRaw);
+      const storedCustomExaminations: CustomExamination[] = JSON.parse(customExaminationsRaw || '[]');
+      console.log('Loaded custom examinations:', storedCustomExaminations);
+      setCustomExaminations(storedCustomExaminations);
 
       console.log('=== END LOCAL STORAGE DEBUG ===');
     } catch (error) {
@@ -166,6 +199,16 @@ const NewAppointment: React.FC = () => {
         vitalSigns: {
           ...prev.vitalSigns,
           [vitalField]: value
+        }
+      }));
+    } else if (name.startsWith('custom_')) {
+      // Handle custom examination inputs
+      console.log('Updating custom examination:', name, 'to:', value);
+      setFormData(prev => ({
+        ...prev,
+        vitalSigns: {
+          ...prev.vitalSigns,
+          [name]: value
         }
       }));
     } else {
@@ -326,7 +369,18 @@ const NewAppointment: React.FC = () => {
           bloodPressure: formData.vitalSigns.bloodPressure.trim() || 'Not recorded',
           respirationRate: formData.vitalSigns.respirationRate ? parseInt(formData.vitalSigns.respirationRate) : 0,
           heartRate: formData.vitalSigns.heartRate ? parseInt(formData.vitalSigns.heartRate) : 0,
-          borgScale: formData.vitalSigns.borgScale ? parseInt(formData.vitalSigns.borgScale) : 0
+          borgScale: formData.vitalSigns.borgScale ? parseInt(formData.vitalSigns.borgScale) : 0,
+          // Include custom examinations
+          ...Object.fromEntries(
+            customExaminations.map(exam => [
+              `custom_${exam.id}`,
+              {
+                name: exam.name,
+                unit: exam.unit,
+                value: (formData.vitalSigns[`custom_${exam.id}`] as string)?.trim() || 'Not recorded'
+              }
+            ])
+          )
         },
         treatments: selectedTreatmentData ? [selectedTreatmentData] : [],
         totalPrice: totalPrice,
@@ -497,99 +551,117 @@ const NewAppointment: React.FC = () => {
             </FormControl>
 
             {/* Vital Signs */}
-            <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 'sm', p: 3 }}>
-              <Typography level="h4" sx={{ mb: 2 }}>Vital Signs</Typography>
+            <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 'sm', px: 3, py: 1 }}>
+              <Typography level="h4" sx={{ mb: 2, mt: 0 }}>Vital Signs</Typography>
               <Stack spacing={2}>
-                {/* Blood Pressure and Respiration Rate side by side */}
-                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
-                  <FormControl sx={{ flex: 1 }}>
-                    <FormLabel>Blood Pressure</FormLabel>
-                    <Input
-                      name="vitalSigns.bloodPressure"
-                      value={formData.vitalSigns.bloodPressure}
-                      onChange={handleInputChange('bloodPressure')}
-                      placeholder="e.g., 120/80 (optional)"
-                      sx={{
-                        width: '100%',
-                        '& input': {
-                          color: '#ffffff !important'
-                        },
-                        '&::placeholder': {
-                          color: '#ffffff !important',
-                          opacity: 0.7
-                        }
-                      }}
-                    />
-                  </FormControl>
+                {/* Responsive layout: horizontal for 16:9, vertical for 9:16 */}
+                <Box sx={{
+                  display: 'flex',
+                  flexDirection: { xs: 'column', md: 'row' },
+                  gap: 3,
+                  alignItems: { xs: 'stretch', md: 'flex-start' }
+                }}>
+                  {/* Left container: Blood Pressure and Respiration Rate */}
+                  <Box sx={{
+                    width: { xs: '100%', md: '410px' },
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 2
+                  }}>
+                    <FormControl>
+                      <FormLabel>Blood Pressure</FormLabel>
+                      <Input
+                        name="vitalSigns.bloodPressure"
+                        value={formData.vitalSigns.bloodPressure}
+                        onChange={handleInputChange('bloodPressure')}
+                        placeholder="e.g., 120/80 (optional)"
+                        sx={{
+                          width: '100%',
+                          '& input': {
+                            color: '#ffffff !important'
+                          },
+                          '&::placeholder': {
+                            color: '#ffffff !important',
+                            opacity: 0.7
+                          }
+                        }}
+                      />
+                    </FormControl>
 
-                  <FormControl sx={{ flex: 1 }}>
-                    <FormLabel>Respiration Rate (breaths/min)</FormLabel>
-                    <Input
-                      type="number"
-                      name="vitalSigns.respirationRate"
-                      value={formData.vitalSigns.respirationRate}
-                      onChange={handleInputChange('respirationRate')}
-                      placeholder="e.g., 16 (optional)"
-                      slotProps={{ input: { min: 0, max: 60 } }}
-                      sx={{
-                        width: '100%',
-                        '& input': {
-                          color: '#ffffff !important'
-                        },
-                        '&::placeholder': {
-                          color: '#ffffff !important',
-                          opacity: 0.7
-                        }
-                      }}
-                    />
-                  </FormControl>
-                </Box>
+                    <FormControl>
+                      <FormLabel>Respiration Rate (breaths/min)</FormLabel>
+                      <Input
+                        type="number"
+                        name="vitalSigns.respirationRate"
+                        value={formData.vitalSigns.respirationRate}
+                        onChange={handleInputChange('respirationRate')}
+                        placeholder="e.g., 16 (optional)"
+                        slotProps={{ input: { min: 0, max: 60 } }}
+                        sx={{
+                          width: '100%',
+                          '& input': {
+                            color: '#ffffff !important'
+                          },
+                          '&::placeholder': {
+                            color: '#ffffff !important',
+                            opacity: 0.7
+                          }
+                        }}
+                      />
+                    </FormControl>
+                  </Box>
 
-                {/* Heart Rate and Borg Scale side by side */}
-                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, alignItems: 'flex-end' }}>
-                  <FormControl sx={{ flex: 1 }}>
-                    <FormLabel>Heart Rate (bpm)</FormLabel>
-                    <Input
-                      type="number"
-                      name="vitalSigns.heartRate"
-                      value={formData.vitalSigns.heartRate}
-                      onChange={handleInputChange('heartRate')}
-                      placeholder="e.g., 72 (optional)"
-                      slotProps={{ input: { min: 0, max: 200 } }}
-                      sx={{
-                        width: '100%',
-                        '& input': {
-                          color: '#ffffff !important'
-                        },
-                        '&::placeholder': {
-                          color: '#ffffff !important',
-                          opacity: 0.7
-                        }
-                      }}
-                    />
-                  </FormControl>
+                  {/* Right container: Heart Rate and Borg Scale */}
+                  <Box sx={{
+                    width: { xs: '100%', md: '410px' },
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 2
+                  }}>
+                    <FormControl>
+                      <FormLabel>Heart Rate (bpm)</FormLabel>
+                      <Input
+                        type="number"
+                        name="vitalSigns.heartRate"
+                        value={formData.vitalSigns.heartRate}
+                        onChange={handleInputChange('heartRate')}
+                        placeholder="e.g., 72 (optional)"
+                        slotProps={{ input: { min: 0, max: 200 } }}
+                        sx={{
+                          width: '100%',
+                          '& input': {
+                            color: '#ffffff !important'
+                          },
+                          '&::placeholder': {
+                            color: '#ffffff !important',
+                            opacity: 0.7
+                          }
+                        }}
+                      />
+                    </FormControl>
 
-                  <FormControl sx={{ flex: 1 }}>
-                    <FormLabel>Borg Scale (1-10)</FormLabel>
-                    <Input
-                      type="number"
-                      name="vitalSigns.borgScale"
-                      value={formData.vitalSigns.borgScale}
-                      onChange={handleInputChange('borgScale')}
-                      placeholder="Rate perceived exertion (optional)"
-                      slotProps={{ input: { min: 1, max: 10 } }}
-                      sx={{
-                        width: '100%',
-                        '& input': {
-                          color: '#ffffff !important'
-                        },
-                        '&::placeholder': {
-                          color: '#ffffff !important',
-                          opacity: 0.7
-                        }
-                      }}
-                    />
-                  </FormControl>
+                    <FormControl>
+                      <FormLabel>Borg Scale (1-10)</FormLabel>
+                      <Input
+                        type="number"
+                        name="vitalSigns.borgScale"
+                        value={formData.vitalSigns.borgScale}
+                        onChange={handleInputChange('borgScale')}
+                        placeholder="Rate perceived exertion (optional)"
+                        slotProps={{ input: { min: 1, max: 10 } }}
+                        sx={{
+                          width: '100%',
+                          '& input': {
+                            color: '#ffffff !important'
+                          },
+                          '&::placeholder': {
+                            color: '#ffffff !important',
+                            opacity: 0.7
+                          }
+                        }}
+                      />
+                    </FormControl>
+                  </Box>
                 </Box>
 
                 {/* Borg Scale description */}
@@ -598,6 +670,37 @@ const NewAppointment: React.FC = () => {
                 </Typography>
               </Stack>
             </Box>
+
+            {/* Custom Examinations Section */}
+            {customExaminations.length > 0 && (
+              <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 'sm', px: 3, py: 1, my: 0.5 }}>
+                <Typography level="h4" sx={{ mb: 2, mt: 0 }}>Examinations & Measurements</Typography>
+                <Stack spacing={2}>
+                  {customExaminations.map((examination) => (
+                    <FormControl key={examination.id}>
+                      <FormLabel>{examination.name} ({examination.unit})</FormLabel>
+                      <Input
+                        name={`custom_${examination.id}`}
+                        value={(formData.vitalSigns[`custom_${examination.id}`] as string) || ''}
+                        onChange={handleInputChange(`custom_${examination.id}`)}
+                        placeholder={`Enter ${examination.name.toLowerCase()} value (optional)`}
+                        sx={{
+                          width: { xs: '100%', md: '800px' },
+                          maxWidth: '100%',
+                          '& input': {
+                            color: '#ffffff !important'
+                          },
+                          '&::placeholder': {
+                            color: '#ffffff !important',
+                            opacity: 0.7
+                          }
+                        }}
+                      />
+                    </FormControl>
+                  ))}
+                </Stack>
+              </Box>
+            )}
 
             {/* Treatment Selection */}
             <FormControl>

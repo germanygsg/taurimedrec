@@ -186,22 +186,70 @@ button:focus-visible {
   }
 }
 
+/* Status bar spacer for all devices to prevent content from being obscured */
+.status-bar-spacer {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100vw;
+  height: 30px;
+  min-height: 30px;
+  background: transparent;
+  z-index: 999;
+  display: block;
+}
+
 @media screen and (max-aspect-ratio: 9/16) {
   .status-bar-spacer {
-    position: sticky;
-    top: 0;
-    left: 0;
-    right: 0;
-    width: 100vw;
+    height: 30px;
     min-height: 30px;
-    background: #181818;
-    z-index: 999;
-    display: block;
   }
-  .main-content {
-    padding-bottom: 25px !important;
+
+  /* Make the actual bottom navbar taller by 15px */
+  .MuiSheet-root[style*="position: fixed"] {
+    height: 75px !important; /* Original 60px + 15px */
   }
-  .bottom-nav {
-    min-height: calc(var(--bottom-nav-height, 64px) + 25px);
+
+  /* Alternative: Target mobile devices specifically */
+  @media screen and (max-width: 768px) {
+    .MuiSheet-root {
+      height: 75px !important; /* Make bottom nav 15px taller */
+    }
+  }
+}
+
+/* Simple fix for the 520px breakpoint - force consistent height */
+@media screen and (max-width: 600px) {
+  main {
+    min-height: 100vh !important;
+  }
+
+  .css-1oklfi6 {
+    min-height: 100vh !important;
+  }
+
+  /* Make all page containers use full viewport height */
+  .MuiBox-root[style*="minHeight: 100%"] {
+    min-height: calc(100vh - 120px) !important;
+    height: calc(100vh - 120px) !important;
+  }
+
+  /* Make tables expand to fill available space */
+  .MuiCard-root {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+  }
+
+  .MuiSheet-root {
+    flex: 1 !important;
+    min-height: 0 !important;
+  }
+
+  /* Ensure table containers expand */
+  table {
+    height: 100% !important;
   }
 }

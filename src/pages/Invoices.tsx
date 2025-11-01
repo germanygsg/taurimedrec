@@ -20,6 +20,16 @@ import Delete from '@mui/icons-material/Delete';
 import Clear from '@mui/icons-material/Clear';
 import ArrowUpward from '@mui/icons-material/ArrowUpward';
 import ArrowDownward from '@mui/icons-material/ArrowDownward';
+import FirstPage from '@mui/icons-material/FirstPage';
+import LastPage from '@mui/icons-material/LastPage';
+import ChevronLeft from '@mui/icons-material/ChevronLeft';
+import ChevronRight from '@mui/icons-material/ChevronRight';
+import ViewColumn from '@mui/icons-material/ViewColumn';
+import Dropdown from '@mui/joy/Dropdown';
+import Menu from '@mui/joy/Menu';
+import MenuButton from '@mui/joy/MenuButton';
+import MenuItem from '@mui/joy/MenuItem';
+import Checkbox from '@mui/joy/Checkbox';
 import { Invoice } from '../types';
 import logService from '../services/logService';
 
@@ -36,6 +46,15 @@ const Invoices: React.FC = () => {
   const [showCustomDateRange, setShowCustomDateRange] = useState(false);
   const [sortField, setSortField] = useState<keyof Invoice | null>('date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [columnVisibility, setColumnVisibility] = useState({
+    invoiceNumber: true,
+    patient: true,
+    date: false,
+    operator: false,
+    totalAmount: false,
+    status: false,
+    actions: true
+  });
 
   useEffect(() => {
     loadInvoices();
@@ -318,6 +337,77 @@ const Invoices: React.FC = () => {
               }
             }}
           />
+          <Dropdown>
+            <MenuButton
+              variant="outlined"
+              startDecorator={<ViewColumn sx={{ color: '#ffffff' }} />}
+              sx={{
+                maxWidth: 160,
+                minWidth: 0,
+                flexShrink: 1,
+                width: 'auto',
+                borderRadius: 'sm',
+                color: '#ffffff',
+                height: 40,
+                minHeight: 40,
+                fontSize: 16,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Columns
+            </MenuButton>
+            <Menu placement="bottom-end">
+              <MenuItem onClick={() => setColumnVisibility(prev => ({ ...prev, invoiceNumber: !prev.invoiceNumber }))}>
+                <Checkbox
+                  checked={columnVisibility.invoiceNumber}
+                  sx={{ mr: 1 }}
+                />
+                <Typography sx={{ color: '#ffffff' }}>Invoice #</Typography>
+              </MenuItem>
+              <MenuItem onClick={() => setColumnVisibility(prev => ({ ...prev, patient: !prev.patient }))}>
+                <Checkbox
+                  checked={columnVisibility.patient}
+                  sx={{ mr: 1 }}
+                />
+                <Typography sx={{ color: '#ffffff' }}>Patient Name</Typography>
+              </MenuItem>
+              <MenuItem onClick={() => setColumnVisibility(prev => ({ ...prev, date: !prev.date }))}>
+                <Checkbox
+                  checked={columnVisibility.date}
+                  sx={{ mr: 1 }}
+                />
+                <Typography sx={{ color: '#ffffff' }}>Date & Time</Typography>
+              </MenuItem>
+              <MenuItem onClick={() => setColumnVisibility(prev => ({ ...prev, operator: !prev.operator }))}>
+                <Checkbox
+                  checked={columnVisibility.operator}
+                  sx={{ mr: 1 }}
+                />
+                <Typography sx={{ color: '#ffffff' }}>Operator</Typography>
+              </MenuItem>
+              <MenuItem onClick={() => setColumnVisibility(prev => ({ ...prev, totalAmount: !prev.totalAmount }))}>
+                <Checkbox
+                  checked={columnVisibility.totalAmount}
+                  sx={{ mr: 1 }}
+                />
+                <Typography sx={{ color: '#ffffff' }}>Total Amount</Typography>
+              </MenuItem>
+              <MenuItem onClick={() => setColumnVisibility(prev => ({ ...prev, status: !prev.status }))}>
+                <Checkbox
+                  checked={columnVisibility.status}
+                  sx={{ mr: 1 }}
+                />
+                <Typography sx={{ color: '#ffffff' }}>Status</Typography>
+              </MenuItem>
+              <MenuItem onClick={() => setColumnVisibility(prev => ({ ...prev, actions: !prev.actions }))}>
+                <Checkbox
+                  checked={columnVisibility.actions}
+                  sx={{ mr: 1 }}
+                />
+                <Typography sx={{ color: '#ffffff' }}>Actions</Typography>
+              </MenuItem>
+            </Menu>
+          </Dropdown>
         </Box>
 
         {/* Date Range Filter */}
@@ -492,9 +582,8 @@ const Invoices: React.FC = () => {
                 aria-labelledby="tableTitle"
                 hoverRow
                 sx={{
-                  minWidth: { xs: '800px', md: 'auto' },
-                  width: { xs: 'max-content', md: '100%' },
-                  tableLayout: { xs: 'auto', md: 'auto' },
+                  width: '100%',
+                  tableLayout: 'auto',
                   '& tbody tr:hover': {
                     backgroundColor: 'background.level2',
                   },
@@ -503,12 +592,10 @@ const Invoices: React.FC = () => {
                     fontWeight: 'bold',
                     color: 'text.primary',
                     whiteSpace: 'nowrap',
-                    minWidth: { xs: '120px', md: 'auto' },
                     padding: { xs: '8px 12px', md: '12px' },
                   },
                   '& tbody td': {
                     whiteSpace: 'nowrap',
-                    minWidth: { xs: '120px', md: 'auto' },
                     padding: { xs: '8px 12px', md: '12px' },
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -517,139 +604,155 @@ const Invoices: React.FC = () => {
               >
             <thead>
               <tr>
-                <th style={{ width: 150, padding: '12px', color: '#ffffff' }}>Invoice #</th>
-                <th style={{ minWidth: 200, padding: '12px', color: '#ffffff' }}>Patient</th>
-                <th
-                  style={{ width: 150, padding: '12px', color: '#ffffff', cursor: 'pointer', userSelect: 'none' }}
-                  onClick={() => handleSort('date')}
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    {sortField === 'date' && (
-                      sortDirection === 'asc' ? <ArrowUpward sx={{ fontSize: 14, color: '#ffffff' }} /> : <ArrowDownward sx={{ fontSize: 14, color: '#ffffff' }} />
-                    )}
-                    Date & Time
-                  </Box>
-                </th>
-                <th style={{ width: 150, padding: '12px', color: '#ffffff' }}>Operator</th>
-                <th style={{ width: 150, padding: '12px', color: '#ffffff' }}>Total Amount</th>
-                <th style={{ width: 120, padding: '12px', color: '#ffffff' }}>Status</th>
-                <th style={{ width: 120, padding: '12px', color: '#ffffff' }}>Actions</th>
+                {columnVisibility.invoiceNumber && <th style={{ padding: '12px', color: '#ffffff' }}>Invoice #</th>}
+                {columnVisibility.patient && <th style={{ padding: '12px', color: '#ffffff' }}>Patient</th>}
+                {columnVisibility.date && (
+                  <th
+                    style={{ padding: '12px', color: '#ffffff', cursor: 'pointer', userSelect: 'none' }}
+                    onClick={() => handleSort('date')}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      {sortField === 'date' && (
+                        sortDirection === 'asc' ? <ArrowUpward sx={{ fontSize: 14, color: '#ffffff' }} /> : <ArrowDownward sx={{ fontSize: 14, color: '#ffffff' }} />
+                      )}
+                      Date & Time
+                    </Box>
+                  </th>
+                )}
+                {columnVisibility.operator && <th style={{ padding: '12px', color: '#ffffff' }}>Operator</th>}
+                {columnVisibility.totalAmount && <th style={{ padding: '12px', color: '#ffffff' }}>Total Amount</th>}
+                {columnVisibility.status && <th style={{ padding: '12px', color: '#ffffff' }}>Status</th>}
+                {columnVisibility.actions && <th style={{ padding: '12px', color: '#ffffff' }}>Actions</th>}
               </tr>
             </thead>
             <tbody>
               {currentInvoices.map((invoice) => (
                 <tr key={invoice.id}>
-                  <td style={{ padding: '12px' }}>
-                    <Typography
-                      component="a"
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        navigate(`/invoices/${invoice.id}`);
-                      }}
-                      sx={{
-                        color: '#ffffff',
-                        textDecoration: 'underline',
-                        cursor: 'pointer',
-                        '&:hover': {
+                  {columnVisibility.invoiceNumber && (
+                    <td style={{ padding: '12px' }}>
+                      <Typography
+                        component="a"
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigate(`/invoices/${invoice.id}`);
+                        }}
+                        sx={{
                           color: '#ffffff',
-                          textDecoration: 'none',
-                          backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                          textShadow: '0 0 8px rgba(255, 255, 255, 0.5)'
-                        }
-                      }}
-                    >
-                      {invoice.invoiceNumber}
-                    </Typography>
-                  </td>
-                  <td style={{ padding: '12px', fontWeight: 500, color: '#ffffff' }}>
-                    <Typography
-                      level="body-sm"
-                      fontWeight="bold"
-                      component="a"
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        navigate(`/patients/${invoice.patientId}`);
-                      }}
-                      sx={{
-                        color: '#ffffff',
-                        textDecoration: 'underline',
-                        cursor: 'pointer',
-                        '&:hover': {
-                          color: '#ffffff',
-                          textDecoration: 'none',
-                          backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                          textShadow: '0 0 8px rgba(255, 255, 255, 0.5)'
-                        }
-                      }}
-                    >
-                      {invoice.patientName}
-                    </Typography>
-                  </td>
-                  <td style={{ padding: '12px', color: '#ffffff' }}>
-                    <Typography
-                      level="body-sm"
-                      component="a"
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        navigate(`/appointments/${invoice.appointmentId}`);
-                      }}
-                      sx={{
-                        color: '#ffffff',
-                        textDecoration: 'underline',
-                        cursor: 'pointer',
-                        '&:hover': {
-                          color: '#ffffff',
-                          textDecoration: 'none',
-                          backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                          textShadow: '0 0 8px rgba(255, 255, 255, 0.5)'
-                        }
-                      }}
-                    >
-                      {formatDate(invoice.date)}
-                    </Typography>
-                  </td>
-                  <td style={{ padding: '12px', color: '#ffffff' }}>
-                    <Typography level="body-sm">
-                      {invoice.operatorName}
-                    </Typography>
-                  </td>
-                  <td style={{ padding: '12px' }}>
-                    <Chip color="success" variant="soft">
-                      {formatCurrency(invoice.totalAmount)}
-                    </Chip>
-                  </td>
-                  <td style={{ padding: '12px' }}>
-                    <Chip
-                      color={getStatusColor(invoice.status)}
-                      variant="soft"
-                      size="sm"
-                    >
-                      {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
-                    </Chip>
-                  </td>
-                  <td style={{ padding: '12px' }}>
-                    <Box sx={{ display: 'flex', gap: 1 }}>
-                      <IconButton
-                        size="sm"
-                        variant="outlined"
-                        color="primary"
-                        onClick={() => navigate(`/invoices/${invoice.id}`)}
+                          textDecoration: 'underline',
+                          cursor: 'pointer',
+                          '&:hover': {
+                            color: '#ffffff',
+                            textDecoration: 'none',
+                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                            textShadow: '0 0 8px rgba(255, 255, 255, 0.5)'
+                          }
+                        }}
                       >
-                        <Visibility />
-                      </IconButton>
-                      <IconButton
-                        size="sm"
-                        variant="outlined"
-                        color="danger"
-                        onClick={() => handleDeleteInvoice(invoice.id)}
+                        {invoice.invoiceNumber}
+                      </Typography>
+                    </td>
+                  )}
+                  {columnVisibility.patient && (
+                    <td style={{ padding: '12px', fontWeight: 500, color: '#ffffff' }}>
+                      <Typography
+                        level="body-sm"
+                        fontWeight="bold"
+                        component="a"
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigate(`/patients/${invoice.patientId}`);
+                        }}
+                        sx={{
+                          color: '#ffffff',
+                          textDecoration: 'underline',
+                          cursor: 'pointer',
+                          '&:hover': {
+                            color: '#ffffff',
+                            textDecoration: 'none',
+                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                            textShadow: '0 0 8px rgba(255, 255, 255, 0.5)'
+                          }
+                        }}
                       >
-                        <Delete />
-                      </IconButton>
-                    </Box>
-                  </td>
+                        {invoice.patientName}
+                      </Typography>
+                    </td>
+                  )}
+                  {columnVisibility.date && (
+                    <td style={{ padding: '12px', color: '#ffffff' }}>
+                      <Typography
+                        level="body-sm"
+                        component="a"
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigate(`/appointments/${invoice.appointmentId}`);
+                        }}
+                        sx={{
+                          color: '#ffffff',
+                          textDecoration: 'underline',
+                          cursor: 'pointer',
+                          '&:hover': {
+                            color: '#ffffff',
+                            textDecoration: 'none',
+                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                            textShadow: '0 0 8px rgba(255, 255, 255, 0.5)'
+                          }
+                        }}
+                      >
+                        {formatDate(invoice.date)}
+                      </Typography>
+                    </td>
+                  )}
+                  {columnVisibility.operator && (
+                    <td style={{ padding: '12px', color: '#ffffff' }}>
+                      <Typography level="body-sm">
+                        {invoice.operatorName}
+                      </Typography>
+                    </td>
+                  )}
+                  {columnVisibility.totalAmount && (
+                    <td style={{ padding: '12px' }}>
+                      <Chip color="success" variant="soft">
+                        {formatCurrency(invoice.totalAmount)}
+                      </Chip>
+                    </td>
+                  )}
+                  {columnVisibility.status && (
+                    <td style={{ padding: '12px' }}>
+                      <Chip
+                        color={getStatusColor(invoice.status)}
+                        variant="soft"
+                        size="sm"
+                      >
+                        {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
+                      </Chip>
+                    </td>
+                  )}
+                  {columnVisibility.actions && (
+                    <td style={{ padding: '12px' }}>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <IconButton
+                          size="sm"
+                          variant="outlined"
+                          color="primary"
+                          onClick={() => navigate(`/invoices/${invoice.id}`)}
+                        >
+                          <Visibility />
+                        </IconButton>
+                        <IconButton
+                          size="sm"
+                          variant="outlined"
+                          color="danger"
+                          onClick={() => handleDeleteInvoice(invoice.id)}
+                        >
+                          <Delete />
+                        </IconButton>
+                      </Box>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -667,16 +770,16 @@ const Invoices: React.FC = () => {
             onClick={() => setCurrentPage(1)}
             disabled={currentPage === 1}
             sx={{ color: '#ffffff', borderColor: '#ffffff' }}
+            startDecorator={<FirstPage />}
           >
-            {'<<'}
           </Button>
           <Button
             variant="outlined"
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
             sx={{ color: '#ffffff', borderColor: '#ffffff' }}
+            startDecorator={<ChevronLeft />}
           >
-            {'<'}
           </Button>
 
           <Typography sx={{
@@ -693,16 +796,16 @@ const Invoices: React.FC = () => {
             onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
             disabled={currentPage === totalPages}
             sx={{ color: '#ffffff', borderColor: '#ffffff' }}
+            startDecorator={<ChevronRight />}
           >
-            {'>'}
           </Button>
           <Button
             variant="outlined"
             onClick={() => setCurrentPage(totalPages)}
             disabled={currentPage === totalPages}
             sx={{ color: '#ffffff', borderColor: '#ffffff' }}
+            startDecorator={<LastPage />}
           >
-            {'>>'}
           </Button>
         </Box>
       )}

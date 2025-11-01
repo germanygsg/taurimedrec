@@ -28,12 +28,12 @@ const MainLayout: React.FC = () => {
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
-          paddingBottom: { xs: '60px', md: 0 },
+          paddingBottom: { xs: '75px', md: 0 }, // Updated to match taller navbar
         }}
       >
         <Box className="status-bar-spacer" />
-        <Box 
-          sx={{ 
+        <Box
+          sx={{
             flex: 1,
             width: '100%',
             minHeight: 0,

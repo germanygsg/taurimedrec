@@ -24,6 +24,10 @@ import Checkbox from '@mui/joy/Checkbox';
 import Clear from '@mui/icons-material/Clear';
 import ArrowUpward from '@mui/icons-material/ArrowUpward';
 import ArrowDownward from '@mui/icons-material/ArrowDownward';
+import FirstPage from '@mui/icons-material/FirstPage';
+import LastPage from '@mui/icons-material/LastPage';
+import ChevronLeft from '@mui/icons-material/ChevronLeft';
+import ChevronRight from '@mui/icons-material/ChevronRight';
 import Select from '@mui/joy/Select';
 import Option from '@mui/joy/Option';
 
@@ -67,7 +71,7 @@ const Appointments: React.FC = () => {
     date: true,
     vitalSigns: false,
     treatments: false,
-    totalPrice: true,
+    totalPrice: false,
     actions: true
   });
   const [sortField, setSortField] = useState<keyof Appointment | null>('date');
@@ -707,16 +711,16 @@ const Appointments: React.FC = () => {
             onClick={() => setCurrentPage(1)}
             disabled={currentPage === 1}
             sx={{ color: '#ffffff', borderColor: '#ffffff' }}
+            startDecorator={<FirstPage />}
           >
-            {'<<'}
           </Button>
           <Button
             variant="outlined"
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
             sx={{ color: '#ffffff', borderColor: '#ffffff' }}
+            startDecorator={<ChevronLeft />}
           >
-            {'<'}
           </Button>
 
           <Typography sx={{
@@ -733,16 +737,16 @@ const Appointments: React.FC = () => {
             onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
             disabled={currentPage === totalPages}
             sx={{ color: '#ffffff', borderColor: '#ffffff' }}
+            startDecorator={<ChevronRight />}
           >
-            {'>'}
           </Button>
           <Button
             variant="outlined"
             onClick={() => setCurrentPage(totalPages)}
             disabled={currentPage === totalPages}
             sx={{ color: '#ffffff', borderColor: '#ffffff' }}
+            startDecorator={<LastPage />}
           >
-            {'>>'}
           </Button>
         </Box>
       )}

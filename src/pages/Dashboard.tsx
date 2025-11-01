@@ -183,19 +183,19 @@ const Dashboard: React.FC = () => {
       boxSizing: 'border-box',
       minWidth: 0
     }}>
-      <Box sx={{ mb: 2 }}>
+      <Box sx={{ mb: 1 }}>
         <Typography level="h2" sx={{ mb: 1 }}>
           Welcome!
         </Typography>
       </Box>
 
-      <Stack spacing={2}>
-        <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', lg: 'row' }, flexWrap: 'wrap' }}>
+      <Stack spacing={1.5}>
+        <Box sx={{ display: 'flex', gap: 1.5, flexDirection: { xs: 'column', lg: 'row' }, flexWrap: 'wrap' }}>
           {/* New Patients This Month Card */}
           <Card
             variant="outlined"
             sx={{
-              p: 2,
+              p: 1.5,
               position: 'relative',
               overflow: 'visible',
               flex: 1,
@@ -206,7 +206,7 @@ const Dashboard: React.FC = () => {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'flex-start',
-            mb: 2
+            mb: 1
           }}>
             <Box>
               <Typography level="h4" sx={{ mb: 0.5 }}>
@@ -236,20 +236,20 @@ const Dashboard: React.FC = () => {
           </Box>
 
           {/* Recharts Line Chart */}
-          <Box sx={{ mt: 1 }}>
+          <Box sx={{ mt: 0.5 }}>
             <Box sx={{
               width: '100%',
               height: 240,
               backgroundColor: 'background.level1',
               borderRadius: 'sm',
-              p: 1.5,
+              p: 1,
               border: '1px solid',
               borderColor: 'divider'
             }}>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   data={stats.monthlyData}
-                  margin={{ top: 15, right: 20, left: 15, bottom: 15 }}
+                  margin={{ top: 10, right: 15, left: 10, bottom: 10 }}
                 >
                   <CartesianGrid
                     strokeDasharray="3 3"
@@ -274,10 +274,7 @@ const Dashboard: React.FC = () => {
                     }}
                     labelStyle={{ color: 'var(--joy-palette-text-primary)' }}
                   />
-                  <Legend
-                    wrapperStyle={{ color: 'var(--joy-palette-text-primary)' }}
-                  />
-                  <Line
+                    <Line
                     type="monotone"
                     dataKey="count"
                     stroke="var(--joy-palette-primary-500)"
@@ -300,14 +297,14 @@ const Dashboard: React.FC = () => {
           <Card
             variant="outlined"
             sx={{
-              p: 2,
+              p: 1.5,
               position: 'relative',
               overflow: 'visible',
               flex: 1,
               minWidth: { xs: '100%', md: '0' }
             }}
           >
-          <Box sx={{ mb: 2 }}>
+          <Box sx={{ mb: 1 }}>
             <Typography level="h4" sx={{ mb: 0.5 }}>
               Appointments This Month
             </Typography>
@@ -320,20 +317,20 @@ const Dashboard: React.FC = () => {
           </Box>
 
           {/* Recharts Line Chart for Appointments */}
-          <Box sx={{ mt: 1 }}>
+          <Box sx={{ mt: 0.5 }}>
             <Box sx={{
               width: '100%',
               height: 240,
               backgroundColor: 'background.level1',
               borderRadius: 'sm',
-              p: 1.5,
+              p: 1,
               border: '1px solid',
               borderColor: 'divider'
             }}>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   data={appointmentStats.monthlyData}
-                  margin={{ top: 15, right: 20, left: 15, bottom: 15 }}
+                  margin={{ top: 10, right: 15, left: 10, bottom: 10 }}
                 >
                   <CartesianGrid
                     strokeDasharray="3 3"
@@ -358,10 +355,7 @@ const Dashboard: React.FC = () => {
                     }}
                     labelStyle={{ color: 'var(--joy-palette-text-primary)' }}
                   />
-                  <Legend
-                    wrapperStyle={{ color: 'var(--joy-palette-text-primary)' }}
-                  />
-                  <Line
+                    <Line
                     type="monotone"
                     dataKey="count"
                     stroke="var(--joy-palette-success-500)"
@@ -382,12 +376,12 @@ const Dashboard: React.FC = () => {
         </Box>
 
         {/* Second Row - Revenue Card */}
-        <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', lg: 'row' }, flexWrap: 'wrap' }}>
+        <Box sx={{ display: 'flex', gap: 1.5, flexDirection: { xs: 'column', lg: 'row' }, flexWrap: 'wrap' }}>
           {/* Revenue This Month Card */}
           <Card
             variant="outlined"
             sx={{
-              p: 2,
+              p: 1.5,
               position: 'relative',
               overflow: 'visible',
               flex: 1,
@@ -398,7 +392,7 @@ const Dashboard: React.FC = () => {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'flex-start',
-            mb: 2
+            mb: 1
           }}>
             <Box>
               <Typography level="h4" sx={{ mb: 0.5 }}>
@@ -428,20 +422,20 @@ const Dashboard: React.FC = () => {
           </Box>
 
           {/* Recharts Revenue Chart */}
-          <Box sx={{ mt: 1 }}>
+          <Box sx={{ mt: 0.5 }}>
             <Box sx={{
               width: '100%',
               height: 240,
               backgroundColor: 'background.level1',
               borderRadius: 'sm',
-              p: 1.5,
+              p: 1,
               border: '1px solid',
               borderColor: 'divider'
             }}>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   data={revenueStats.monthlyData}
-                  margin={{ top: 15, right: 20, left: 15, bottom: 15 }}
+                  margin={{ top: 10, right: 15, left: 10, bottom: 10 }}
                 >
                   <CartesianGrid
                     strokeDasharray="3 3"
@@ -468,10 +462,7 @@ const Dashboard: React.FC = () => {
                     labelStyle={{ color: 'var(--joy-palette-text-primary)' }}
                     formatter={(value: number) => [formatCurrency(value), 'Revenue']}
                   />
-                  <Legend
-                    wrapperStyle={{ color: 'var(--joy-palette-text-primary)' }}
-                  />
-                  <Line
+                    <Line
                     type="monotone"
                     dataKey="revenue"
                     stroke="var(--joy-palette-primary-500)"

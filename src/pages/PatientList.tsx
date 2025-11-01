@@ -23,6 +23,10 @@ import Delete from '@mui/icons-material/Delete';
 import ViewColumn from '@mui/icons-material/ViewColumn';
 import ArrowUpward from '@mui/icons-material/ArrowUpward';
 import ArrowDownward from '@mui/icons-material/ArrowDownward';
+import FirstPage from '@mui/icons-material/FirstPage';
+import LastPage from '@mui/icons-material/LastPage';
+import ChevronLeft from '@mui/icons-material/ChevronLeft';
+import ChevronRight from '@mui/icons-material/ChevronRight';
 import { Patient, ColumnVisibility } from '../types';
 import { databaseService } from '../services/database';
 
@@ -34,11 +38,11 @@ const PatientList: React.FC = () => {
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>({
     record_number: false,
     name: true,
-    age: true,
-    address: true,
+    age: false,
+    address: false,
     phone_number: false,
     initial_diagnosis: false,
-    date_added: true,
+    date_added: false,
   });
   const [sortField, setSortField] = useState<keyof Patient | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
@@ -187,12 +191,15 @@ const PatientList: React.FC = () => {
   return (
       <Box sx={{
         width: '100%',
-        minHeight: '100%',
+        height: '100%',
+        minHeight: 'calc(100vh - 120px)', // Account for header and navbar on mobile
         p: { xs: 1, md: 2 },
         pt: { xs: 0, md: 2 },
         pr: { xs: 2, md: 2 },
         boxSizing: 'border-box',
-        minWidth: 0
+        minWidth: 0,
+        display: 'flex',
+        flexDirection: 'column'
       }}>
       <Box sx={{ mb: 1.5 }}>
         <Typography level="h3" sx={{ fontSize: '30px', color: '#ffffff' }}>Patients</Typography>
@@ -288,13 +295,15 @@ const PatientList: React.FC = () => {
         </Box>
       )}
 
-      <Card>
-        <Sheet sx={{ 
-          overflow: 'auto', 
-          borderRadius: 'sm', 
+      <Card sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+        <Sheet sx={{
+          overflow: 'auto',
+          borderRadius: 'sm',
           overflowX: 'auto',
           width: '100%',
-          maxWidth: '100%'
+          maxWidth: '100%',
+          flex: 1,
+          minHeight: 0
         }}>
           <Box sx={{ overflowX: 'auto', width: '100%' }}>
             <Table
@@ -475,10 +484,10 @@ const PatientList: React.FC = () => {
 
       {/* Pagination Controls */}
       {totalPages > 1 && (
-        <Box sx={{ 
-          mt: 3, 
-          display: 'flex', 
-          justifyContent: 'center', 
+        <Box sx={{
+          mt: 3,
+          display: 'flex',
+          justifyContent: 'center',
           gap: 1,
           flexWrap: 'wrap',
           pr: { xs: 0, md: 0 }
@@ -488,16 +497,16 @@ const PatientList: React.FC = () => {
             onClick={() => setCurrentPage(1)}
             disabled={currentPage === 1}
             sx={{ color: '#ffffff', borderColor: '#ffffff' }}
+            startDecorator={<FirstPage />}
           >
-            {'<<'}
           </Button>
           <Button
             variant="outlined"
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
             sx={{ color: '#ffffff', borderColor: '#ffffff' }}
+            startDecorator={<ChevronLeft />}
           >
-            {'<'}
           </Button>
 
           <Typography sx={{
@@ -514,16 +523,16 @@ const PatientList: React.FC = () => {
             onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
             disabled={currentPage === totalPages}
             sx={{ color: '#ffffff', borderColor: '#ffffff' }}
+            startDecorator={<ChevronRight />}
           >
-            {'>'}
           </Button>
           <Button
             variant="outlined"
             onClick={() => setCurrentPage(totalPages)}
             disabled={currentPage === totalPages}
             sx={{ color: '#ffffff', borderColor: '#ffffff' }}
+            startDecorator={<LastPage />}
           >
-            {'>>'}
           </Button>
         </Box>
       )}
