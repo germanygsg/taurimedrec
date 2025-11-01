@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Box from '@mui/joy/Box';
 import Card from '@mui/joy/Card';
@@ -9,7 +9,6 @@ import Input from '@mui/joy/Input';
 import Button from '@mui/joy/Button';
 import Alert from '@mui/joy/Alert';
 import Stack from '@mui/joy/Stack';
-import Checkbox from '@mui/joy/Checkbox';
 import Select from '@mui/joy/Select';
 import Option from '@mui/joy/Option';
 import ArrowBack from '@mui/icons-material/ArrowBack';
@@ -78,7 +77,7 @@ const NewAppointment: React.FC = () => {
 
   useEffect(() => {
     calculateTotalPrice();
-  }, [formData.selectedTreatment, treatments]);
+  }, [formData.selectedTreatment, treatments, calculateTotalPrice]);
 
   const loadData = async () => {
     try {
@@ -217,7 +216,7 @@ const NewAppointment: React.FC = () => {
     }));
   };
 
-  const calculateTotalPrice = () => {
+  const calculateTotalPrice = useCallback(() => {
     if (formData.selectedTreatment === null) {
       setTotalPrice(0);
       return;
@@ -226,7 +225,7 @@ const NewAppointment: React.FC = () => {
     const treatment = treatments.find(t => t.id === formData.selectedTreatment);
     const total = treatment?.price || 0;
     setTotalPrice(total);
-  };
+  }, [formData.selectedTreatment, treatments]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('id-ID', {

@@ -26,7 +26,7 @@ declare module '@tauri-apps/plugin-fs' {
 
 declare global {
   interface Window {
-    __TAURI__?: any;
+    __TAURI__?: Record<string, unknown>;
   }
 }
 

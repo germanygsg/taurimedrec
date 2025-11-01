@@ -15,7 +15,7 @@ import Settings from '@mui/icons-material/Settings';
 import CalendarMonth from '@mui/icons-material/CalendarMonth';
 import Receipt from '@mui/icons-material/Receipt';
 import Assessment from '@mui/icons-material/Assessment';
-import { useSidebar } from '../../contexts/SidebarContext';
+import { useSidebar } from '../../hooks/useSidebar';
 
 const Sidebar: React.FC = () => {
   const { isCollapsed, toggleSidebar } = useSidebar();

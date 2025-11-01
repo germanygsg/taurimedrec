@@ -9,13 +9,11 @@ import Option from '@mui/joy/Option';
 import Stack from '@mui/joy/Stack';
 import CircularProgress from '@mui/joy/CircularProgress';
 import Chip from '@mui/joy/Chip';
-import ArrowBack from '@mui/icons-material/ArrowBack';
 import Assessment from '@mui/icons-material/Assessment';
 import Person from '@mui/icons-material/Person';
 import CalendarToday from '@mui/icons-material/CalendarToday';
 import AttachMoney from '@mui/icons-material/AttachMoney';
 import Receipt from '@mui/icons-material/Receipt';
-import TrendingUp from '@mui/icons-material/TrendingUp';
 import Modal from '@mui/joy/Modal';
 import ModalDialog from '@mui/joy/ModalDialog';
 import ModalClose from '@mui/joy/ModalClose';
@@ -23,7 +21,7 @@ import Divider from '@mui/joy/Divider';
 import Table from '@mui/joy/Table';
 import Input from '@mui/joy/Input';
 import Search from '@mui/icons-material/Search';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface Appointment {
   id: number;
@@ -84,7 +82,6 @@ interface ReportData {
 }
 
 const Reports: React.FC = () => {
-  const navigate = useNavigate();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [operators, setOperators] = useState<Operator[]>([]);
@@ -102,8 +99,7 @@ const Reports: React.FC = () => {
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [patientSearchTerm, setPatientSearchTerm] = useState<string>('');
   const [vitalSignsData, setVitalSignsData] = useState<VitalSignsData[]>([]);
-  const [patientsLoading, setPatientsLoading] = useState(false);
-
+  
   // Modal states
   const [showInvoicesModal, setShowInvoicesModal] = useState(false);
   const [selectedOperator, setSelectedOperator] = useState<ReportData | null>(null);
@@ -114,7 +110,7 @@ const Reports: React.FC = () => {
 
   useEffect(() => {
     generateReport();
-  }, [selectedMonth, selectedYear, selectedOperators, appointments, invoices]);
+  }, [selectedMonth, selectedYear, selectedOperators, appointments, invoices, generateReport]);
 
   const loadData = () => {
     try {

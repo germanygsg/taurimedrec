@@ -5,7 +5,7 @@ import {
   extendTheme,
 } from '@mui/joy/styles';
 import CssBaseline from '@mui/joy/CssBaseline';
-import { SidebarProvider } from './contexts/SidebarContext';
+import { SidebarProvider } from './contexts/SidebarContextProvider';
 import MainLayout from './components/Layout/MainLayout';
 import Dashboard from './pages/Dashboard';
 import PatientList from './pages/PatientList';

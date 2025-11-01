@@ -60,7 +60,7 @@ const getInitialPatients = (): Patient[] => {
 const getNextId = (): number => {
   const patients = getInitialPatients();
   if (patients.length === 0) return 1;
-  return Math.max(...patients.map((p: any) => p.id || 0)) + 1;
+  return Math.max(...patients.map((p: Patient) => p.id || 0)) + 1;
 };
 
 export const databaseService = {
