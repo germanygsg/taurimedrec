@@ -75,6 +75,17 @@ const NewAppointment: React.FC = () => {
     checkForPreSelectedPatient();
   }, []);
 
+  const calculateTotalPrice = useCallback(() => {
+    if (formData.selectedTreatment === null) {
+      setTotalPrice(0);
+      return;
+    }
+
+    const treatment = treatments.find(t => t.id === formData.selectedTreatment);
+    const total = treatment?.price || 0;
+    setTotalPrice(total);
+  }, [formData.selectedTreatment, treatments]);
+
   useEffect(() => {
     calculateTotalPrice();
   }, [formData.selectedTreatment, treatments, calculateTotalPrice]);
@@ -215,17 +226,6 @@ const NewAppointment: React.FC = () => {
       selectedTreatment: value ? parseInt(value) : null
     }));
   };
-
-  const calculateTotalPrice = useCallback(() => {
-    if (formData.selectedTreatment === null) {
-      setTotalPrice(0);
-      return;
-    }
-
-    const treatment = treatments.find(t => t.id === formData.selectedTreatment);
-    const total = treatment?.price || 0;
-    setTotalPrice(total);
-  }, [formData.selectedTreatment, treatments]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('id-ID', {

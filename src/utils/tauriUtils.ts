@@ -6,7 +6,7 @@ declare global {
 }
 
 export async function importTauriDialog() {
-  if (!(window as Record<string, unknown>).__TAURI__) {
+  if (!(window as unknown as Record<string, unknown>).__TAURI__) {
     throw new Error('Not in Tauri environment');
   }
 
@@ -20,7 +20,7 @@ export async function importTauriDialog() {
 }
 
 export async function importTauriFs() {
-  if (!(window as Record<string, unknown>).__TAURI__) {
+  if (!(window as unknown as Record<string, unknown>).__TAURI__) {
     throw new Error('Not in Tauri environment');
   }
 
@@ -34,5 +34,5 @@ export async function importTauriFs() {
 }
 
 export function isTauriEnvironment(): boolean {
-  return !!(window as Record<string, unknown>).__TAURI__;
+  return !!(window as unknown as Record<string, unknown>).__TAURI__;
 }

@@ -89,7 +89,7 @@ export const databaseService = {
     const currentCounter = parseInt(localStorage.getItem(RECORD_COUNTER_KEY) || '3');
     localStorage.setItem(RECORD_COUNTER_KEY, String(currentCounter + 1));
 
-    return newPatient.id;
+    return newPatient.id!;
   },
 
   async updatePatient(id: number, patient: Omit<Patient, 'id' | 'created_at'>): Promise<string> {

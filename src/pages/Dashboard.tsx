@@ -155,7 +155,7 @@ const Dashboard: React.FC = () => {
         const invoiceDate = new Date(invoice.date);
         return invoiceDate.getMonth() === currentMonth &&
                invoiceDate.getFullYear() === currentYear;
-      }).reduce((total, invoice) => total + ((invoice.totalAmount || 0)), 0);
+      }).reduce((total: number, invoice: Invoice) => total + ((invoice.totalAmount || 0)), 0);
 
       // Generate monthly data for revenue
       const revenueMonthlyData = [];
@@ -170,12 +170,12 @@ const Dashboard: React.FC = () => {
             const invoiceDate = new Date(invoice.date);
             return invoiceDate >= monthStart && invoiceDate <= monthEnd;
           })
-          .reduce((total, invoice) => total + ((invoice.totalAmount || 0)), 0);
+          .reduce((total: number, invoice: Invoice) => total + ((invoice.totalAmount || 0)), 0);
 
         revenueMonthlyData.push({ month: monthName, revenue: monthlyRevenue });
       }
 
-      const totalRevenue = paidInvoices.reduce((total, invoice) => total + (invoice.totalAmount || 0), 0);
+      const totalRevenue = paidInvoices.reduce((total: number, invoice: Invoice) => total + (invoice.totalAmount || 0), 0);
 
       setRevenueStats({
         totalRevenue,

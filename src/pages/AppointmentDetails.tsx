@@ -69,12 +69,6 @@ const AppointmentDetails: React.FC = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  useEffect(() => {
-    if (id) {
-      loadAppointment(parseInt(id));
-    }
-  }, [id, loadAppointment]);
-
   const loadAppointment = useCallback(async (appointmentId: number) => {
     try {
       const storedAppointments = localStorage.getItem('appointments');
@@ -99,6 +93,12 @@ const AppointmentDetails: React.FC = () => {
       setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    if (id) {
+      loadAppointment(parseInt(id));
+    }
+  }, [id, loadAppointment]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('id-ID', {
