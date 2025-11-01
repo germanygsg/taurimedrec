@@ -1,0 +1,109 @@
+name: Build Ubuntu App (Mobile Branch - Clean)
+
+# Workflow for building Ubuntu applications for mobile branch
+# Triggers: push to mobile-ubuntu-clean branch, pull requests, manual dispatch
+# Builds: DEB packages, AppImage, and binary executable
+
+on:
+  push:
+    branches: [ mobile-ubuntu-clean ]
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+      - 'LICENSE'
+  pull_request:
+    branches: [ mobile-ubuntu-clean ]
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for manual trigger'
+        required: false
+        default: 'Manual build trigger - mobile branch'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-mobile-ubuntu:
+    name: Build Ubuntu App for Mobile Branch
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        toolchain: stable
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          libwebkit2gtk-4.1-dev \
+          build-essential \
+          curl \
+          wget \
+          libssl-dev \
+          libgtk-3-dev \
+          libayatana-appindicator3-dev \
+          librsvg2-dev \
+          patchelf
+
+    - name: Rust cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          src-tauri/target
+        key: ${{ runner.os }}-cargo-mobile-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-mobile-
+          ${{ runner.os }}-cargo-
+
+    - name: Install frontend dependencies
+      run: npm ci
+
+    - name: Build frontend for mobile branch
+      run: |
+        echo "Building frontend for mobile branch..."
+        npm run build
+
+    - name: Build Tauri app for Ubuntu (Mobile)
+      run: |
+        echo "Building Ubuntu application for mobile branch..."
+        npm run tauri build
+
+    - name: Upload Ubuntu artifacts (Mobile)
+      uses: actions/upload-artifact@v4
+      with:
+        name: ubuntu-build-mobile
+        path: |
+          src-tauri/target/release/bundle/deb/*.deb
+          src-tauri/target/release/bundle/appimage/*.AppImage
+          src-tauri/target/release/patient-management-app
+        retention-days: 30
+
+    - name: Display build info
+      run: |
+        echo "✅ Ubuntu build for mobile branch completed successfully!"
+        echo "📦 Build artifacts uploaded to GitHub Actions"
+        echo "🔗 Branch: mobile"
+        echo "📅 Build date: $(date)"
+        echo "📋 Generated files:"
+        find src-tauri/target/release/bundle -name "*.deb" -o -name "*.AppImage" | head -10 || echo "No bundle files found"
+        echo ""
+        echo "🚀 To download artifacts:"
+        echo "1. Go to: https://github.com/germanygsg/taurimedrec/actions"
+        echo "2. Click on the latest workflow run"
+        echo "3. Download 'ubuntu-build-mobile' artifacts"
